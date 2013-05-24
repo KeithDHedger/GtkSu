@@ -14,7 +14,6 @@ scriptfilesdir = $(pkgdatadir)/scripts
 scriptfiles_SCRIPTS = ../resources/scripts/README
 
 bin_PROGRAMS = gtksu
-	echo "XXXXXXXX"
 
 man1_MANS = ../resources/man/gtksu.1
 

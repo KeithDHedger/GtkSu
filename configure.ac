@@ -26,5 +26,11 @@ PKG_CHECK_MODULES(GTK, $GTK_MODULES)
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_LIBS)
 
-AC_OUTPUT(Makefile GtkSu/app/Makefile GtkSu/debug/Makefile)
+GLIB_MODULES="glib-2.0 >= 2.34.1"
+PKG_CHECK_MODULES(GLIB, $GLIB_MODULES)
+AC_SUBST(GLIB_CFLAGS)
+AC_SUBST(GLIB_LIBS)
+
+
+AC_OUTPUT(Makefile GtkSu/app/Makefile GtkSu/debug/Makefile GtkSu/MakeSuWrap/Makefile)
 

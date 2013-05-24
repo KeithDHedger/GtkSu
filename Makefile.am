@@ -1,5 +1,5 @@
 
-SUBDIRS = GtkSu/app GtkSu/debug
+SUBDIRS = GtkSu/app GtkSu/MakeSuWrap
 
 remake:
 	$(shell ./remakesourcelist)

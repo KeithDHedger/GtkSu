@@ -4,49 +4,16 @@
  *
  */
 
-
-//#include <stdio.h>
-//#include <stdlib.h>
-#include <pwd.h>
-#include <shadow.h>
-//#include <sys/types.h>
-//#include <unistd.h>
-//#include <stdlib.h>
-//#include <gtk/gtk.h>
-//#include <string.h>
-//#include <sys/stat.h>
-//#include <crypt.h>
-//#include <shadow.h>
-//
-//#define UPAP_AUTHNAK 1
-//#define UPAP_AUTHACK 0
-//#define USE_SHADOW
-//char*	username;
-
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <crypt.h>
 #include <stdlib.h>
 #include <gtk/gtk.h>
 #include <sys/stat.h>
 
-
-int checkPasswd(char* username,char* passwd)
-{
-	char	*result;
-	spwd*	shadow_entry=NULL;
-	setuid(0);
-	shadow_entry=getspnam(username);
-	if(shadow_entry==NULL)
-		{
-		printf(":(\n");
-		return(1);
-		}
-	result=crypt(passwd,shadow_entry->sp_pwdp);
-
-	return(strcmp(result,shadow_entry->sp_pwdp));
-}
+#include <pwd.h>
+#include <shadow.h>
+#include <crypt.h>
 
 GtkWidget*	window=NULL;
 GtkWidget*	nameEntry=NULL;
@@ -82,7 +49,8 @@ void doButton(GtkWidget* widget,gpointer data)
 	FILE*	fp;
 	char	buffer[64];
 	int		retval;
-
+	char*	command;
+	
 	printf("button %i\n",(int)(bool)data);
 	if((bool)data==false)
 		shutdown(NULL,NULL);
@@ -95,11 +63,14 @@ void doButton(GtkWidget* widget,gpointer data)
 			retval=pclose(fp);
 			if(retval==0)
 				{
-					if(checkPasswd((char*)gtk_entry_get_text((GtkEntry*)nameEntry),(char*)gtk_entry_get_text((GtkEntry*)passEntry))==0)
+					asprintf(&command,"/home/keithhedger/Development/Projects/GtkSu/GtkSu/MakeSuWrap/gtksuwrap checkpassword \"%s\" \"%s\"",(char*)gtk_entry_get_text((GtkEntry*)nameEntry),(char*)gtk_entry_get_text((GtkEntry*)passEntry));
+					if(system(command)==0)
 						printf("user and pass ok\n");
 					else
 						printf("user and pass :(:(\n");
 				}
+			else
+				printf("Unknown User\n");
 		}
 }
 
@@ -130,6 +101,7 @@ int main(int argc,char **argv)
 	nameEntry=gtk_entry_new();
 	g_signal_connect_after(G_OBJECT(nameEntry),"activate",G_CALLBACK(doButton),(void*)true);
 	passEntry=gtk_entry_new();
+	gtk_entry_set_visibility((GtkEntry*)passEntry,false);
 	g_signal_connect_after(G_OBJECT(passEntry),"activate",G_CALLBACK(doButton),(void*)true);
 
 	gtk_box_pack_start(GTK_BOX(vbox),gtk_label_new("User Name"),false,true,0);
