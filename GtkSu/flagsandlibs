@@ -7,7 +7,9 @@ AM_CPPFLAGS =	-I$(top_srcdir) \
 			-DSYSCONFDIR=\""${sysconfdir}/${PACKAGE}"\" \
 			-DLIBDIR=\""${libdir}/${PACKAGE}"\"
 
+
 LIBS =	$(GTK_LIBS) \
 		$(GLIB_LIBS) \
 		-lcrypt
 
+#			-DSUWRAPPATH=\""${prefix}/bin/gtksuwrap"\"

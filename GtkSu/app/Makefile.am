@@ -18,13 +18,14 @@ bin_PROGRAMS = gtksu
 man1_MANS = ../resources/man/gtksu.1
 
 install-exec-hook:
-	cp ../resources/pixmaps/GtkSu.desktop /usr/share/applications/GtkSu.desktop
-	echo Icon=${prefix}/share/GtkSu/pixmaps/GtkSu.png >> /usr/share/applications/GtkSu.desktop
-	echo Exec=${prefix}/bin/gtksu >> /usr/share/applications/GtkSu.desktop
-
+	mkdir -vp $(DESTDIR)${prefix}/share/applications
+	cp ../resources/pixmaps/GtkSu.desktop $(DESTDIR)${prefix}/share/applications/GtkSu.desktop
+	echo Icon=$(DESTDIR)${prefix}/share/GtkSu/pixmaps/GtkSu.png >> $(DESTDIR)${prefix}/share/applications/GtkSu.desktop
+	echo Exec=$(DESTDIR)${prefix}/bin/gtksu >> $(DESTDIR)${prefix}/share/applications/GtkSu.desktop
+	ln -sv gtksu $(DESTDIR)${prefix}/bin/ktsuss
 
 uninstall-hook:
-	rm -f /usr/share/applications/GtkSu.desktop
+	rm -f $(DESTDIR)${prefix}/share/applications/GtkSu.desktop
 #	update-menus
 	rm -fr $(pkgdatadir)
 

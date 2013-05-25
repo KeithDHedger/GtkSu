@@ -19,28 +19,38 @@ GtkWidget*	window=NULL;
 GtkWidget*	nameEntry=NULL;
 GtkWidget*	passEntry=NULL;
 
-int			gargc;
-char**		gargv;
+int		gargc;
+char**	gargv;
+char*	whereFrom;
 
 void shutdown(GtkWidget* widget,gpointer data)
 {
 	gtk_main_quit();
 }
 
-int runAsUser(void)
+int runAsUser(int theuid)
 {
 	int			ret;
-	int			j;
-	GString*	str=g_string_new("/home/keithhedger/Development/Projects/GtkSu/GtkSu/MakeSuWrap/gtksuwrap");
+	GString*	str=g_string_new(NULL);
+	bool		lastwasarg=false;
 
-	for(j=1;j<gargc;j++)
+	g_string_append_printf(str,"%s/gtksuwrap %i",whereFrom,theuid);
+
+	for(int j=1;j<gargc;j++)
 		{
-			if(gargv[j][0]!='-')
-				g_string_append_printf(str," \"%s\"",gargv[j]);
+			if(gargv[j][0]=='-')
+				lastwasarg=true;
+			else
+				{
+					if(lastwasarg==true)
+						lastwasarg=false;
+					else
+						g_string_append_printf(str," \"%s\"",gargv[j]);
+				}
 		}
 
-//	setuid(0);
 	ret=system(str->str);
+	g_string_free(str,true);
 	return(ret);
 }
 
@@ -50,8 +60,7 @@ void doButton(GtkWidget* widget,gpointer data)
 	char	buffer[64];
 	int		retval;
 	char*	command;
-	
-	printf("button %i\n",(int)(bool)data);
+
 	if((bool)data==false)
 		shutdown(NULL,NULL);
 	else
@@ -63,19 +72,16 @@ void doButton(GtkWidget* widget,gpointer data)
 			retval=pclose(fp);
 			if(retval==0)
 				{
-					asprintf(&command,"/home/keithhedger/Development/Projects/GtkSu/GtkSu/MakeSuWrap/gtksuwrap checkpassword \"%s\" \"%s\"",(char*)gtk_entry_get_text((GtkEntry*)nameEntry),(char*)gtk_entry_get_text((GtkEntry*)passEntry));
+					asprintf(&command,"%s/gtksuwrap checkpassword \"%s\" \"%s\"",whereFrom,(char*)gtk_entry_get_text((GtkEntry*)nameEntry),(char*)gtk_entry_get_text((GtkEntry*)passEntry));
 					if(system(command)==0)
 						{
-						g_free(command);
-						printf("user and pass ok\n");
-						runAsUser();
-						printf("XXXX\n");
-						shutdown(NULL,NULL);
+							g_free(command);
+							runAsUser(atoi(buffer));
+							shutdown(NULL,NULL);
 						}
 					else
 						{
-						g_free(command);
-						printf("user and pass :(:(\n");
+							g_free(command);
 						}
 				}
 			else
@@ -83,15 +89,18 @@ void doButton(GtkWidget* widget,gpointer data)
 		}
 }
 
+void getPath( )
+{
+	char	arg1[20];
+	char	exepath[PATH_MAX+1]={0};
+
+	sprintf(arg1,"/proc/%d/exe",getpid());
+	readlink( arg1,exepath,1024 );
+	whereFrom=g_path_get_dirname(exepath);
+}
+
 int main(int argc,char **argv)
 {
-
-
-//	struct spwd* shadow_entry;
-//	shadow_entry=getspnam("keithhedger");
-//	printf("%s \n",shadow_entry->sp_namp);
-//	return 0;
-
 
 	GtkWidget*	vbox;
 	GtkWidget*	hbox;
@@ -100,8 +109,10 @@ int main(int argc,char **argv)
 
 	gargc=argc;
 	gargv=argv;
+	getPath();
 
 	gtk_init(&argc,&argv);
+
 	window=gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title((GtkWindow*)window,"GtkSu");
 	g_signal_connect(G_OBJECT(window),"delete-event",G_CALLBACK(shutdown),NULL);
@@ -138,9 +149,19 @@ int main(int argc,char **argv)
 
 	gtk_widget_set_can_default(buttonok,true);
 	gtk_widget_grab_default(buttonok);
+
+	for(int j=1;j<argc;j++)
+		{
+			if(argv[j][0]=='-')
+				{
+					if(argv[j][1]=='u')
+						gtk_entry_set_text((GtkEntry*)nameEntry,argv[j+1]);
+					if(argv[j][1]=='m')
+						gtk_window_set_title((GtkWindow*)window,argv[j+1]);
+				}
+		}
+
 	gtk_widget_show_all(window);
-
-
 	gtk_main();
 }
 
