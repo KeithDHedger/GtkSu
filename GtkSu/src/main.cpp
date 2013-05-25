@@ -27,22 +27,22 @@ void shutdown(GtkWidget* widget,gpointer data)
 	gtk_main_quit();
 }
 
-//int runAsUser(void)
-//{
-//	int			ret;
-//	int			j;
-//	GString*	str=g_string_new(NULL);
-//
-//	for(j=1;j<argc;j++)
-	//	{
-		//	if(argv[j][0]!='-')
-			//	g_string_append_printf(str," \"%s\"",argv[j]);
-		//}
+int runAsUser(void)
+{
+	int			ret;
+	int			j;
+	GString*	str=g_string_new("/home/keithhedger/Development/Projects/GtkSu/GtkSu/MakeSuWrap/gtksuwrap");
 
-//	setresuid(0,0,0);
-//	ret=system(str->str);
-//	return(ret);
-//}
+	for(j=1;j<gargc;j++)
+		{
+			if(gargv[j][0]!='-')
+				g_string_append_printf(str," \"%s\"",gargv[j]);
+		}
+
+//	setuid(0);
+	ret=system(str->str);
+	return(ret);
+}
 
 void doButton(GtkWidget* widget,gpointer data)
 {
@@ -65,9 +65,18 @@ void doButton(GtkWidget* widget,gpointer data)
 				{
 					asprintf(&command,"/home/keithhedger/Development/Projects/GtkSu/GtkSu/MakeSuWrap/gtksuwrap checkpassword \"%s\" \"%s\"",(char*)gtk_entry_get_text((GtkEntry*)nameEntry),(char*)gtk_entry_get_text((GtkEntry*)passEntry));
 					if(system(command)==0)
+						{
+						g_free(command);
 						printf("user and pass ok\n");
+						runAsUser();
+						printf("XXXX\n");
+						shutdown(NULL,NULL);
+						}
 					else
+						{
+						g_free(command);
 						printf("user and pass :(:(\n");
+						}
 				}
 			else
 				printf("Unknown User\n");
