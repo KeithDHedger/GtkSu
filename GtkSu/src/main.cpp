@@ -76,6 +76,7 @@ void doButton(GtkWidget* widget,gpointer data)
 					if(system(command)==0)
 						{
 							g_free(command);
+							gtk_widget_hide(window);
 							runAsUser(atoi(buffer));
 							shutdown(NULL,NULL);
 						}
@@ -119,6 +120,7 @@ int main(int argc,char **argv)
 
 	vbox=gtk_vbox_new(false,0);
 	nameEntry=gtk_entry_new();
+	gtk_entry_set_text((GtkEntry*)nameEntry,"root");
 	g_signal_connect_after(G_OBJECT(nameEntry),"activate",G_CALLBACK(doButton),(void*)true);
 	passEntry=gtk_entry_new();
 	gtk_entry_set_visibility((GtkEntry*)passEntry,false);
