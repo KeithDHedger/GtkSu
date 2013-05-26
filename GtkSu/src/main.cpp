@@ -31,11 +31,10 @@ void shutdown(GtkWidget* widget,gpointer data)
 
 int runAsUser(int theuid,char*user,char* hashedpass)
 {
-	int			ret;
 	GString*	str=g_string_new(NULL);
 	bool		lastwasarg=false;
 
-	g_string_append_printf(str,"%s/gtksuwrap %i '%s' '%s' ",whereFrom,theuid,user,hashedpass);
+	g_string_append_printf(str,"%s/gtksuwrap %i '%s' '%s'",whereFrom,theuid,user,hashedpass);
 
 	for(int j=1;j<gargc;j++)
 		{
@@ -49,11 +48,11 @@ int runAsUser(int theuid,char*user,char* hashedpass)
 						g_string_append_printf(str," \"%s\"",gargv[j]);
 				}
 		}
-	printf("this is the command %s\n",str->str);
 
-	ret=system(str->str);
+	system(str->str);
 	g_string_free(str,true);
-	return(ret);
+	shutdown(NULL,NULL);
+	return(0);
 }
 
 void doButton(GtkWidget* widget,gpointer data)
@@ -64,6 +63,7 @@ void doButton(GtkWidget* widget,gpointer data)
 	char*	command;
 	char*	resulthash=NULL;
 	int		uid;
+	int		itworked;
 
 	if((bool)data==false)
 		shutdown(NULL,NULL);
@@ -77,40 +77,27 @@ void doButton(GtkWidget* widget,gpointer data)
 			if(retval==0)
 				{
 					uid=atoi(buffer);
-					//asprintf(&command,"%s/gtksuwrap checkpassword \"%s\" \"%s\"",whereFrom,(char*)gtk_entry_get_text((GtkEntry*)nameEntry),(char*)gtk_entry_get_text((GtkEntry*)passEntry));
-					//if(system(command)==0)
-					//	{
-					//		g_free(command);
-							//gtk_widget_hide(window);
-							//runAsUser(atoi(buffer),(char*)gtk_entry_get_text((GtkEntry*)nameEntry),(char*)gtk_entry_get_text((GtkEntry*)passEntry));
-							asprintf(&command,"%s/gtksuwrap gethash %s",whereFrom,(char*)gtk_entry_get_text((GtkEntry*)nameEntry));
-							//printf("1st hash%s\n",command);
-							fp=popen(command,"r");
+					asprintf(&command,"%s/gtksuwrap gethash %s",whereFrom,(char*)gtk_entry_get_text((GtkEntry*)nameEntry));
+					fp=popen(command,"r");
+					g_free(command);
+					if(fp!=NULL)
+						{
 							fgets(buffer,255,fp);
 							buffer[strlen(buffer)-1]=0;
 							pclose(fp);
-//							shutdown(NULL,NULL);
-							g_free(command);
 							asprintf(&hashedPass,"%s",buffer);
-							printf("got this back %s\n",hashedPass);
 							resulthash=crypt((char*)gtk_entry_get_text((GtkEntry*)passEntry),hashedPass);
+
 							if(strcmp(hashedPass,resulthash)==0)
 								{
-									printf("ok\nhash is %s\nname is %s\nuid is %i\n",hashedPass,(char*)gtk_entry_get_text((GtkEntry*)nameEntry),uid);
-									runAsUser(uid,(char*)gtk_entry_get_text((GtkEntry*)nameEntry),resulthash);
+									itworked=runAsUser(uid,(char*)gtk_entry_get_text((GtkEntry*)nameEntry),resulthash);
+									if(itworked==0)
+										shutdown(NULL,NULL);
+									else
+										gtk_widget_show_all(window);
 								}
-							else
-								{
-									printf("no\n");
-								}
-							printf("%s\n%s\n",hashedPass,resulthash);
-							return;
-							
-					//	}
-					//else
-					//	{
-					//		g_free(command);
-					//	}
+						}
+					return;
 				}
 			else
 				printf("Unknown User\n");
@@ -129,15 +116,6 @@ void getPath( )
 
 int main(int argc,char **argv)
 {
-//#printf("%s\n",crypt(argv[1],"$6$MpKKGZ51ecliMq$f9h/0XU5EF/dsL8YeeoAePiC55/GsG9V4Meg4e4w8CWBtl1iefVtiBRfi5XXuyTTe0MNfczOiB2mRlCE8Fscz."));
-//return 0;
-//
-//spwd*	shadow_entry=NULL;
-//
-//	shadow_entry=getspnam(argv[1]);
-//	printf("%s\n",shadow_entry->sp_pwdp);
-//	return 0;
-
 	GtkWidget*	vbox;
 	GtkWidget*	hbox;
 	GtkWidget*	buttonok;
@@ -158,7 +136,7 @@ int main(int argc,char **argv)
 	gtk_entry_set_text((GtkEntry*)nameEntry,"root");
 	g_signal_connect_after(G_OBJECT(nameEntry),"activate",G_CALLBACK(doButton),(void*)true);
 	passEntry=gtk_entry_new();
-	gtk_entry_set_visibility((GtkEntry*)passEntry,true);
+	gtk_entry_set_visibility((GtkEntry*)passEntry,false);
 	g_signal_connect_after(G_OBJECT(passEntry),"activate",G_CALLBACK(doButton),(void*)true);
 
 	gtk_box_pack_start(GTK_BOX(vbox),gtk_label_new("User Name"),false,true,0);
@@ -184,9 +162,6 @@ int main(int argc,char **argv)
 	gtk_box_pack_start(GTK_BOX(vbox),hbox,true,true,4);
 	gtk_container_add(GTK_CONTAINER(window),vbox);
 
-	gtk_widget_set_can_default(buttonok,true);
-	gtk_widget_grab_default(buttonok);
-
 	for(int j=1;j<argc;j++)
 		{
 			if(argv[j][0]=='-')
@@ -197,9 +172,12 @@ int main(int argc,char **argv)
 						gtk_window_set_title((GtkWindow*)window,argv[j+1]);
 				}
 		}
-gtk_entry_set_text((GtkEntry*)passEntry,"c4ffc8023f");
+
 	gtk_widget_show_all(window);
+	gtk_widget_grab_focus(passEntry);
 	gtk_main();
+
+	return(0);
 }
 
 
