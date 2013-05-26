@@ -57,13 +57,14 @@ int runAsUser(int theuid,char*user,char* hashedpass)
 
 void doButton(GtkWidget* widget,gpointer data)
 {
-	FILE*	fp;
-	char	buffer[256];
-	int		retval;
-	char*	command;
-	char*	resulthash=NULL;
-	int		uid;
-	int		itworked;
+	FILE*		fp;
+	char		buffer[256];
+	int			retval;
+	char*		command;
+	char*		resulthash=NULL;
+	int			uid;
+	int			itworked;
+	GtkWidget*	message;
 
 	if((bool)data==false)
 		shutdown(NULL,NULL);
@@ -95,6 +96,12 @@ void doButton(GtkWidget* widget,gpointer data)
 										shutdown(NULL,NULL);
 									else
 										gtk_widget_show_all(window);
+								}
+							else
+								{
+									message=gtk_message_dialog_new((GtkWindow*)window,GTK_DIALOG_MODAL,GTK_MESSAGE_ERROR,GTK_BUTTONS_CLOSE,"Username and/or Password incorrect\n");
+									 gtk_dialog_run((GtkDialog*)message);
+									 gtk_widget_destroy(message);
 								}
 						}
 					return;
