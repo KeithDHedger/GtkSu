@@ -29,13 +29,13 @@ void shutdown(GtkWidget* widget,gpointer data)
 	gtk_main_quit();
 }
 
-int runAsUser(int theuid,char*user,char* passwd)
+int runAsUser(int theuid,char*user,char* hashedpass)
 {
 	int			ret;
 	GString*	str=g_string_new(NULL);
 	bool		lastwasarg=false;
 
-	g_string_append_printf(str,"%s/gtksuwrap %i %s %s ",whereFrom,theuid,user,passwd);
+	g_string_append_printf(str,"%s/gtksuwrap %i '%s' '%s' ",whereFrom,theuid,user,hashedpass);
 
 	for(int j=1;j<gargc;j++)
 		{
@@ -49,9 +49,9 @@ int runAsUser(int theuid,char*user,char* passwd)
 						g_string_append_printf(str," \"%s\"",gargv[j]);
 				}
 		}
+	printf("this is the command %s\n",str->str);
 
 	ret=system(str->str);
-	printf("%s\n",str->str);
 	g_string_free(str,true);
 	return(ret);
 }
@@ -63,6 +63,7 @@ void doButton(GtkWidget* widget,gpointer data)
 	int		retval;
 	char*	command;
 	char*	resulthash=NULL;
+	int		uid;
 
 	if((bool)data==false)
 		shutdown(NULL,NULL);
@@ -75,6 +76,7 @@ void doButton(GtkWidget* widget,gpointer data)
 			retval=pclose(fp);
 			if(retval==0)
 				{
+					uid=atoi(buffer);
 					//asprintf(&command,"%s/gtksuwrap checkpassword \"%s\" \"%s\"",whereFrom,(char*)gtk_entry_get_text((GtkEntry*)nameEntry),(char*)gtk_entry_get_text((GtkEntry*)passEntry));
 					//if(system(command)==0)
 					//	{
@@ -82,7 +84,7 @@ void doButton(GtkWidget* widget,gpointer data)
 							//gtk_widget_hide(window);
 							//runAsUser(atoi(buffer),(char*)gtk_entry_get_text((GtkEntry*)nameEntry),(char*)gtk_entry_get_text((GtkEntry*)passEntry));
 							asprintf(&command,"%s/gtksuwrap gethash %s",whereFrom,(char*)gtk_entry_get_text((GtkEntry*)nameEntry));
-							printf("%s\n",command);
+							//printf("1st hash%s\n",command);
 							fp=popen(command,"r");
 							fgets(buffer,255,fp);
 							buffer[strlen(buffer)-1]=0;
@@ -90,10 +92,12 @@ void doButton(GtkWidget* widget,gpointer data)
 //							shutdown(NULL,NULL);
 							g_free(command);
 							asprintf(&hashedPass,"%s",buffer);
+							printf("got this back %s\n",hashedPass);
 							resulthash=crypt((char*)gtk_entry_get_text((GtkEntry*)passEntry),hashedPass);
 							if(strcmp(hashedPass,resulthash)==0)
 								{
-									printf("ok\n");
+									printf("ok\nhash is %s\nname is %s\nuid is %i\n",hashedPass,(char*)gtk_entry_get_text((GtkEntry*)nameEntry),uid);
+									runAsUser(uid,(char*)gtk_entry_get_text((GtkEntry*)nameEntry),resulthash);
 								}
 							else
 								{
@@ -154,7 +158,7 @@ int main(int argc,char **argv)
 	gtk_entry_set_text((GtkEntry*)nameEntry,"root");
 	g_signal_connect_after(G_OBJECT(nameEntry),"activate",G_CALLBACK(doButton),(void*)true);
 	passEntry=gtk_entry_new();
-	gtk_entry_set_visibility((GtkEntry*)passEntry,false);
+	gtk_entry_set_visibility((GtkEntry*)passEntry,true);
 	g_signal_connect_after(G_OBJECT(passEntry),"activate",G_CALLBACK(doButton),(void*)true);
 
 	gtk_box_pack_start(GTK_BOX(vbox),gtk_label_new("User Name"),false,true,0);
@@ -193,7 +197,7 @@ int main(int argc,char **argv)
 						gtk_window_set_title((GtkWindow*)window,argv[j+1]);
 				}
 		}
-
+gtk_entry_set_text((GtkEntry*)passEntry,"c4ffc8023f");
 	gtk_widget_show_all(window);
 	gtk_main();
 }
