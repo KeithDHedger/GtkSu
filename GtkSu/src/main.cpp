@@ -22,19 +22,20 @@ GtkWidget*	passEntry=NULL;
 int		gargc;
 char**	gargv;
 char*	whereFrom;
+char*	hashedPass=NULL;
 
 void shutdown(GtkWidget* widget,gpointer data)
 {
 	gtk_main_quit();
 }
 
-int runAsUser(int theuid)
+int runAsUser(int theuid,char*user,char* passwd)
 {
 	int			ret;
 	GString*	str=g_string_new(NULL);
 	bool		lastwasarg=false;
 
-	g_string_append_printf(str,"%s/gtksuwrap %i",whereFrom,theuid);
+	g_string_append_printf(str,"%s/gtksuwrap %i %s %s ",whereFrom,theuid,user,passwd);
 
 	for(int j=1;j<gargc;j++)
 		{
@@ -50,6 +51,7 @@ int runAsUser(int theuid)
 		}
 
 	ret=system(str->str);
+	printf("%s\n",str->str);
 	g_string_free(str,true);
 	return(ret);
 }
@@ -57,9 +59,10 @@ int runAsUser(int theuid)
 void doButton(GtkWidget* widget,gpointer data)
 {
 	FILE*	fp;
-	char	buffer[64];
+	char	buffer[256];
 	int		retval;
 	char*	command;
+	char*	resulthash=NULL;
 
 	if((bool)data==false)
 		shutdown(NULL,NULL);
@@ -72,18 +75,38 @@ void doButton(GtkWidget* widget,gpointer data)
 			retval=pclose(fp);
 			if(retval==0)
 				{
-					asprintf(&command,"%s/gtksuwrap checkpassword \"%s\" \"%s\"",whereFrom,(char*)gtk_entry_get_text((GtkEntry*)nameEntry),(char*)gtk_entry_get_text((GtkEntry*)passEntry));
-					if(system(command)==0)
-						{
+					//asprintf(&command,"%s/gtksuwrap checkpassword \"%s\" \"%s\"",whereFrom,(char*)gtk_entry_get_text((GtkEntry*)nameEntry),(char*)gtk_entry_get_text((GtkEntry*)passEntry));
+					//if(system(command)==0)
+					//	{
+					//		g_free(command);
+							//gtk_widget_hide(window);
+							//runAsUser(atoi(buffer),(char*)gtk_entry_get_text((GtkEntry*)nameEntry),(char*)gtk_entry_get_text((GtkEntry*)passEntry));
+							asprintf(&command,"%s/gtksuwrap gethash %s",whereFrom,(char*)gtk_entry_get_text((GtkEntry*)nameEntry));
+							printf("%s\n",command);
+							fp=popen(command,"r");
+							fgets(buffer,255,fp);
+							buffer[strlen(buffer)-1]=0;
+							pclose(fp);
+//							shutdown(NULL,NULL);
 							g_free(command);
-							gtk_widget_hide(window);
-							runAsUser(atoi(buffer));
-							shutdown(NULL,NULL);
-						}
-					else
-						{
-							g_free(command);
-						}
+							asprintf(&hashedPass,"%s",buffer);
+							resulthash=crypt((char*)gtk_entry_get_text((GtkEntry*)passEntry),hashedPass);
+							if(strcmp(hashedPass,resulthash)==0)
+								{
+									printf("ok\n");
+								}
+							else
+								{
+									printf("no\n");
+								}
+							printf("%s\n%s\n",hashedPass,resulthash);
+							return;
+							
+					//	}
+					//else
+					//	{
+					//		g_free(command);
+					//	}
 				}
 			else
 				printf("Unknown User\n");
@@ -102,6 +125,14 @@ void getPath( )
 
 int main(int argc,char **argv)
 {
+//#printf("%s\n",crypt(argv[1],"$6$MpKKGZ51ecliMq$f9h/0XU5EF/dsL8YeeoAePiC55/GsG9V4Meg4e4w8CWBtl1iefVtiBRfi5XXuyTTe0MNfczOiB2mRlCE8Fscz."));
+//return 0;
+//
+//spwd*	shadow_entry=NULL;
+//
+//	shadow_entry=getspnam(argv[1]);
+//	printf("%s\n",shadow_entry->sp_pwdp);
+//	return 0;
 
 	GtkWidget*	vbox;
 	GtkWidget*	hbox;
