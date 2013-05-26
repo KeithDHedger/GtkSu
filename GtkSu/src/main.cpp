@@ -99,7 +99,8 @@ void doButton(GtkWidget* widget,gpointer data)
 								}
 							else
 								{
-									message=gtk_message_dialog_new((GtkWindow*)window,GTK_DIALOG_MODAL,GTK_MESSAGE_ERROR,GTK_BUTTONS_CLOSE,"Username and/or Password incorrect\n");
+									message=gtk_message_dialog_new((GtkWindow*)window,GTK_DIALOG_MODAL,GTK_MESSAGE_ERROR,GTK_BUTTONS_CLOSE,"Could not run %s\n",gargv[1]);
+									gtk_message_dialog_format_secondary_text((GtkMessageDialog*)message,"Username and/or Password incorrect\n");
 									 gtk_dialog_run((GtkDialog*)message);
 									 gtk_widget_destroy(message);
 								}
