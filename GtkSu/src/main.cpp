@@ -15,14 +15,29 @@
 #include <shadow.h>
 #include <crypt.h>
 
+#include <getopt.h>
+
+#define VERSION 0.0.5
+
 GtkWidget*	window=NULL;
 GtkWidget*	nameEntry=NULL;
 GtkWidget*	passEntry=NULL;
 
-int		gargc;
-char**	gargv;
-char*	whereFrom;
-char*	hashedPass=NULL;
+int			gargc;
+char**		gargv;
+char*		whereFrom;
+char*		hashedPass=NULL;
+char*		userName=NULL;
+char*		bodyMessage=NULL;
+
+struct option long_options[]=
+	{
+		{"version",0,0,'v'},
+		{"user",1,0,'u'},
+		{"message",1,0,'m'},
+		{"help",0,0,'h'},
+		{0, 0, 0, 0}
+	};
 
 void shutdown(GtkWidget* widget,gpointer data)
 {
@@ -129,6 +144,44 @@ int main(int argc,char **argv)
 	GtkWidget*	buttonok;
 	GtkWidget*	button;
 
+	int c;
+
+	while (1)
+		{
+			int option_index=0;
+			c=getopt_long_only(argc,argv,"u:m:v?h",long_options,&option_index);
+
+			if (c==-1)
+				break;
+
+			switch (c)
+				{
+					case '?':
+					case 'h':
+						printhelp();
+						return 0;
+						break;
+			
+					case 'u':
+						userName=optarg;
+						break;
+
+					case 'v':
+						printf("Xfce-Theme-Manager Version %s \nCopyright K.D.Hedger 2012, %s\n",VERSION,MYEMAIL);
+						return 0;
+						break;
+
+					case 'm':
+						bodyMessage=optarg;
+						break;
+
+					default:
+						printf ("?? Unknown argument ??\n");
+						return 1;
+						break;
+			}
+		}
+
 	gargc=argc;
 	gargv=argv;
 	getPath();
@@ -177,6 +230,8 @@ int main(int argc,char **argv)
 					if(argv[j][1]=='u')
 						gtk_entry_set_text((GtkEntry*)nameEntry,argv[j+1]);
 					if(argv[j][1]=='m')
+						gtk_window_set_title((GtkWindow*)window,argv[j+1]);
+					if(argv[j][1]=='v')
 						gtk_window_set_title((GtkWindow*)window,argv[j+1]);
 				}
 		}
