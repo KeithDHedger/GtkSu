@@ -54,10 +54,8 @@ int main(int argc, char **argv)
 	if(checkPasswd(argv[2],argv[3])==0)
 		{
 			for(j=4;j<argc;j++)
-				{
-					if(argv[j][0]!='-')
-						g_string_append_printf(str," \"%s\"",argv[j]);
-				}
+				g_string_append_printf(str," \"%s\"",argv[j]);
+
 			g_string_append_printf(str," &");
 			setresuid(theuid,theuid,theuid);
 			system(str->str);
@@ -71,7 +69,3 @@ int main(int argc, char **argv)
 		}
 	
 }
-//	-v, --version        Gives ktsuss version info
-//	-u, --user USER      Runs the command as the given user
-//	-m, --message MESG   Change default message in ktsuss window
-//	-h, --help           Show this help

@@ -142,7 +142,7 @@ int main(int argc,char **argv)
 	while (1)
 		{
 			option_index=0;
-			c=getopt_long_only(argc,argv,":u:m:v?h",long_options,&option_index);
+			c=getopt_long_only(argc,argv,"u:m:v?h",long_options,&option_index);
 
 			if (c==-1)
 				break;
@@ -170,14 +170,10 @@ int main(int argc,char **argv)
 
 					default:
 						printf ("?? Unknown argument ??\n");
-						return 1;
 						break;
 			}
 		}
 
-//for(int k=optind;k<argc;k++)
-//	printf("%s\n",argv[k]);
-//return 0;
 	gargc=argc;
 	gargv=argv;
 	getPath();
@@ -228,19 +224,6 @@ int main(int argc,char **argv)
 
 	gtk_box_pack_start(GTK_BOX(vbox),hbox,true,true,4);
 	gtk_container_add(GTK_CONTAINER(window),vbox);
-
-//	for(int j=1;j<argc;j++)
-//		{
-//			if(argv[j][0]=='-')
-//				{
-//					if(argv[j][1]=='u')
-//						gtk_entry_set_text((GtkEntry*)nameEntry,argv[j+1]);
-//					if(argv[j][1]=='m')
-//						gtk_window_set_title((GtkWindow*)window,argv[j+1]);
-//					if(argv[j][1]=='v')
-//						gtk_window_set_title((GtkWindow*)window,argv[j+1]);
-//				}
-//		}
 
 	gtk_widget_show_all(window);
 
