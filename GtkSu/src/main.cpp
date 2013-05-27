@@ -118,8 +118,17 @@ void doButton(GtkWidget* widget,gpointer data)
 				printf("Unknown User\n");
 		}
 }
+void printHelp(void)
+{
+	printf("GtkSu Version %s \nCopyright K.D.Hedger 2013, %s\n",VERSION,MYEMAIL);
+	printf("Usage: gtksu [OPTION] [--] <command>\n");
+	printf("Run a command as another user\n");
+	printf("-u, --user USER			Runs the command as the given user\n");
+	printf("-m, --message MESG		Change default message in ktsuss window\n");
 
-void getPath( )
+}
+
+void getPath(void)
 {
 	char	arg1[32];
 	char	exepath[PATH_MAX+1]={0};
@@ -151,7 +160,7 @@ int main(int argc,char **argv)
 				{
 					case '?':
 					case 'h':
-						//printhelp();
+						printHelp();
 						return 0;
 						break;
 			
