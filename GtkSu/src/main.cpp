@@ -17,8 +17,9 @@
 
 #include <getopt.h>
 
-#define VERSION 0.0.5
-
+#define		VERSION "0.0.5"
+#define		MYEMAIL "kdhedger68713@gmail.com"
+ 
 GtkWidget*	window=NULL;
 GtkWidget*	nameEntry=NULL;
 GtkWidget*	passEntry=NULL;
@@ -29,6 +30,8 @@ char*		whereFrom;
 char*		hashedPass=NULL;
 char*		userName=NULL;
 char*		bodyMessage=NULL;
+
+GString*	runOptions=g_string_new(NULL);
 
 struct option long_options[]=
 	{
@@ -47,22 +50,11 @@ void shutdown(GtkWidget* widget,gpointer data)
 int runAsUser(int theuid,char*user,char* hashedpass)
 {
 	GString*	str=g_string_new(NULL);
-	bool		lastwasarg=false;
 
 	g_string_append_printf(str,"%s/gtksuwrap %i '%s' '%s'",whereFrom,theuid,user,hashedpass);
 
-	for(int j=1;j<gargc;j++)
-		{
-			if(gargv[j][0]=='-')
-				lastwasarg=true;
-			else
-				{
-					if(lastwasarg==true)
-						lastwasarg=false;
-					else
-						g_string_append_printf(str," \"%s\"",gargv[j]);
-				}
-		}
+	for(int k=optind;k<gargc;k++)
+		g_string_append_printf(str," \"%s\"",gargv[k]);
 
 	system(str->str);
 	g_string_free(str,true);
@@ -129,11 +121,11 @@ void doButton(GtkWidget* widget,gpointer data)
 
 void getPath( )
 {
-	char	arg1[20];
+	char	arg1[32];
 	char	exepath[PATH_MAX+1]={0};
 
 	sprintf(arg1,"/proc/%d/exe",getpid());
-	readlink( arg1,exepath,1024 );
+	readlink(arg1,exepath,1024);
 	whereFrom=g_path_get_dirname(exepath);
 }
 
@@ -145,11 +137,12 @@ int main(int argc,char **argv)
 	GtkWidget*	button;
 
 	int c;
+	int option_index=0;
 
 	while (1)
 		{
-			int option_index=0;
-			c=getopt_long_only(argc,argv,"u:m:v?h",long_options,&option_index);
+			option_index=0;
+			c=getopt_long_only(argc,argv,":u:m:v?h",long_options,&option_index);
 
 			if (c==-1)
 				break;
@@ -158,7 +151,7 @@ int main(int argc,char **argv)
 				{
 					case '?':
 					case 'h':
-						printhelp();
+						//printhelp();
 						return 0;
 						break;
 			
@@ -167,7 +160,7 @@ int main(int argc,char **argv)
 						break;
 
 					case 'v':
-						printf("Xfce-Theme-Manager Version %s \nCopyright K.D.Hedger 2012, %s\n",VERSION,MYEMAIL);
+						printf("GtkSu Version %s \nCopyright K.D.Hedger 2013, %s\n",VERSION,MYEMAIL);
 						return 0;
 						break;
 
@@ -182,6 +175,9 @@ int main(int argc,char **argv)
 			}
 		}
 
+//for(int k=optind;k<argc;k++)
+//	printf("%s\n",argv[k]);
+//return 0;
 	gargc=argc;
 	gargv=argv;
 	getPath();
@@ -194,13 +190,23 @@ int main(int argc,char **argv)
 
 	vbox=gtk_vbox_new(false,0);
 	nameEntry=gtk_entry_new();
-	gtk_entry_set_text((GtkEntry*)nameEntry,"root");
 	g_signal_connect_after(G_OBJECT(nameEntry),"activate",G_CALLBACK(doButton),(void*)true);
+
+	if(userName!=NULL)
+		{
+			gtk_entry_set_text((GtkEntry*)nameEntry,userName);
+			gtk_widget_hide(nameEntry);
+		}
+	else
+		{
+			gtk_entry_set_text((GtkEntry*)nameEntry,"root");
+			gtk_box_pack_start(GTK_BOX(vbox),gtk_label_new("User Name"),false,true,0);
+		}
+
 	passEntry=gtk_entry_new();
 	gtk_entry_set_visibility((GtkEntry*)passEntry,false);
 	g_signal_connect_after(G_OBJECT(passEntry),"activate",G_CALLBACK(doButton),(void*)true);
 
-	gtk_box_pack_start(GTK_BOX(vbox),gtk_label_new("User Name"),false,true,0);
 	gtk_box_pack_start(GTK_BOX(vbox),nameEntry,false,true,0);
 	gtk_box_pack_start(GTK_BOX(vbox),gtk_label_new("Password"),false,true,0);
 	gtk_box_pack_start(GTK_BOX(vbox),passEntry,false,true,0);
@@ -223,20 +229,24 @@ int main(int argc,char **argv)
 	gtk_box_pack_start(GTK_BOX(vbox),hbox,true,true,4);
 	gtk_container_add(GTK_CONTAINER(window),vbox);
 
-	for(int j=1;j<argc;j++)
-		{
-			if(argv[j][0]=='-')
-				{
-					if(argv[j][1]=='u')
-						gtk_entry_set_text((GtkEntry*)nameEntry,argv[j+1]);
-					if(argv[j][1]=='m')
-						gtk_window_set_title((GtkWindow*)window,argv[j+1]);
-					if(argv[j][1]=='v')
-						gtk_window_set_title((GtkWindow*)window,argv[j+1]);
-				}
-		}
+//	for(int j=1;j<argc;j++)
+//		{
+//			if(argv[j][0]=='-')
+//				{
+//					if(argv[j][1]=='u')
+//						gtk_entry_set_text((GtkEntry*)nameEntry,argv[j+1]);
+//					if(argv[j][1]=='m')
+//						gtk_window_set_title((GtkWindow*)window,argv[j+1]);
+//					if(argv[j][1]=='v')
+//						gtk_window_set_title((GtkWindow*)window,argv[j+1]);
+//				}
+//		}
 
 	gtk_widget_show_all(window);
+
+	if(userName!=NULL)
+		gtk_widget_hide(nameEntry);
+
 	gtk_widget_grab_focus(passEntry);
 	gtk_main();
 
