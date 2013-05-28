@@ -4,13 +4,15 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <errno.h>
 
 #include <pwd.h>
 #include <shadow.h>
 #include <crypt.h>
 #include <gtk/gtk.h>
 
-#define VERSION 0.0.5
+#define	VERSION 0.0.5
+#define	NOSHADOWUSER -1
 
 int checkPasswd(char* username,char* hashedpass)
 {
@@ -18,7 +20,7 @@ int checkPasswd(char* username,char* hashedpass)
 
 	shadow_entry=getspnam(username);
 	if(shadow_entry==NULL)
-		return(-1);
+		return(NOSHADOWUSER);
 	else
 		return(strcmp(hashedpass,shadow_entry->sp_pwdp));
 }
@@ -29,7 +31,9 @@ int sendHashBack(char* username)
 
 	shadow_entry=getspnam(username);
 	if(shadow_entry==NULL)
-		return(-1);
+		{
+			return(NOSHADOWUSER);
+		}
 	else
 		{
 			printf("%s\n",shadow_entry->sp_pwdp);
@@ -41,13 +45,14 @@ int main(int argc, char **argv)
 {
 	int	j;
 	int	theuid=atoi(argv[1]);
+	int	retval;
 
 	GString*	str=g_string_new(NULL);
 
 	if(strcmp(argv[1],"gethash")==0)
 		{	
-			sendHashBack(argv[2]);
-			return(0);
+			retval=sendHashBack(argv[2]);
+			return(retval);
 		}
 
 
@@ -67,5 +72,4 @@ int main(int argc, char **argv)
 		{
 			return(-200);
 		}
-	
 }

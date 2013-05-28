@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
 #include <sys/stat.h>
+#include <errno.h>
 
 #include <pwd.h>
 #include <shadow.h>
@@ -19,7 +20,9 @@
 
 #define		VERSION "0.0.5"
 #define		MYEMAIL "kdhedger68713@gmail.com"
- 
+
+#define		NOSHADOWUSER -1
+
 GtkWidget*	window=NULL;
 GtkWidget*	nameEntry=NULL;
 GtkWidget*	passEntry=NULL;
@@ -62,6 +65,15 @@ int runAsUser(int theuid,char*user,char* hashedpass)
 	return(0);
 }
 
+void doErrorMessage(const char* message,const char* data,const char* secondmessage)
+{
+	GtkWidget*	dialog;
+	dialog=gtk_message_dialog_new((GtkWindow*)window,GTK_DIALOG_MODAL,GTK_MESSAGE_ERROR,GTK_BUTTONS_CLOSE,"%s %s\n",message,data);
+	gtk_message_dialog_format_secondary_text((GtkMessageDialog*)dialog,"%s\n",secondmessage);
+	gtk_dialog_run((GtkDialog*)dialog);
+	gtk_widget_destroy(dialog);
+}
+
 void doButton(GtkWidget* widget,gpointer data)
 {
 	FILE*		fp;
@@ -72,6 +84,7 @@ void doButton(GtkWidget* widget,gpointer data)
 	int			uid;
 	int			itworked;
 	GtkWidget*	message;
+	int			serrno=-1;
 
 	if((bool)data==false)
 		shutdown(NULL,NULL);
@@ -85,19 +98,26 @@ void doButton(GtkWidget* widget,gpointer data)
 			if(retval==0)
 				{
 					uid=atoi(buffer);
+					errno=0;
+					buffer[0]=0;
 					asprintf(&command,"%s/gtksuwrap gethash %s",whereFrom,(char*)gtk_entry_get_text((GtkEntry*)nameEntry));
 					fp=popen(command,"r");
+					serrno=errno;
 					g_free(command);
 					if(fp!=NULL)
 						{
 							fgets(buffer,255,fp);
+							if(strlen(buffer)>0)
+							{
 							buffer[strlen(buffer)-1]=0;
+					printf("XXX%i\n",serrno);
 							pclose(fp);
 							asprintf(&hashedPass,"%s",buffer);
 							resulthash=crypt((char*)gtk_entry_get_text((GtkEntry*)passEntry),hashedPass);
 
-							if(strcmp(hashedPass,resulthash)==0)
+							if((strcmp(hashedPass,resulthash)==0) && (resulthash!=NULL))
 								{
+					printf("ZZZZZ%s\n%s\n",hashedPass,resulthash);
 									itworked=runAsUser(uid,(char*)gtk_entry_get_text((GtkEntry*)nameEntry),resulthash);
 									if(itworked==0)
 										shutdown(NULL,NULL);
@@ -106,16 +126,14 @@ void doButton(GtkWidget* widget,gpointer data)
 								}
 							else
 								{
-									message=gtk_message_dialog_new((GtkWindow*)window,GTK_DIALOG_MODAL,GTK_MESSAGE_ERROR,GTK_BUTTONS_CLOSE,"Could not run %s\n",gargv[1]);
-									gtk_message_dialog_format_secondary_text((GtkMessageDialog*)message,"Username and/or Password incorrect\n");
-									 gtk_dialog_run((GtkDialog*)message);
-									 gtk_widget_destroy(message);
+									doErrorMessage("Could not run ",gargv[1],"Username and/or Password incorrect");
 								}
+							}
 						}
 					return;
 				}
 			else
-				printf("Unknown User\n");
+				doErrorMessage("Unknown User ",gtk_entry_get_text((GtkEntry*)nameEntry),"");
 		}
 }
 void printHelp(void)
