@@ -114,8 +114,12 @@ void doButton(GtkWidget* widget,gpointer data)
 							pclose(fp);
 							asprintf(&hashedPass,"%s",buffer);
 							resulthash=crypt((char*)gtk_entry_get_text((GtkEntry*)passEntry),hashedPass);
-
-							if((strcmp(hashedPass,resulthash)==0) && (resulthash!=NULL))
+					printf("ZZZZZ%s\n","fdjgkl");
+//if(hashedPass==NULL)
+//printf("AAA\n");
+//if(resulthash==NULL)
+//printf("bbbbbb\n");
+							if((resulthash!=NULL) && (strcmp(hashedPass,resulthash)==0))
 								{
 					printf("ZZZZZ%s\n%s\n",hashedPass,resulthash);
 									itworked=runAsUser(uid,(char*)gtk_entry_get_text((GtkEntry*)nameEntry),resulthash);
