@@ -32,6 +32,7 @@ int sendHashBack(char* username)
 	shadow_entry=getspnam(username);
 	if(shadow_entry==NULL)
 		{
+			printf("XXX\n");
 			return(NOSHADOWUSER);
 		}
 	else

@@ -107,14 +107,13 @@ void doButton(GtkWidget* widget,gpointer data)
 					if(fp!=NULL)
 						{
 							fgets(buffer,255,fp);
-							if(strlen(buffer)>0)
-							{
+					//		if(strlen(buffer)>0)
+					//		{
 							buffer[strlen(buffer)-1]=0;
-					printf("XXX%i\n",serrno);
 							pclose(fp);
 							asprintf(&hashedPass,"%s",buffer);
 							resulthash=crypt((char*)gtk_entry_get_text((GtkEntry*)passEntry),hashedPass);
-					printf("ZZZZZ%s\n","fdjgkl");
+
 //if(hashedPass==NULL)
 //printf("AAA\n");
 //if(resulthash==NULL)
@@ -132,7 +131,7 @@ void doButton(GtkWidget* widget,gpointer data)
 								{
 									doErrorMessage("Could not run ",gargv[1],"Username and/or Password incorrect");
 								}
-							}
+							//}
 						}
 					return;
 				}

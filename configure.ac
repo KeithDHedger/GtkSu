@@ -31,6 +31,17 @@ PKG_CHECK_MODULES(GLIB, $GLIB_MODULES)
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
 
+AC_MSG_CHECKING(pretend to be ktsuss)
+
+AC_ARG_ENABLE(ktsuss-link,
+     [  --enable-ktsuss-link    Create a symlink from ktsuss to gtksu.],
+     [case "${enableval}" in
+       yes) ktsuss=true ;;
+       no)  ktsuss=false ;;
+       *) AC_MSG_ERROR(bad value ${enableval} for --enable-ktsuss-link ) ;;
+     esac],[ktsuss=false])
+     AM_CONDITIONAL(KTSUSSLINK, test x$ktsuss = xtrue)
+AC_MSG_RESULT($ktsuss)
 
 AC_OUTPUT(Makefile GtkSu/app/Makefile GtkSu/debug/Makefile GtkSu/MakeSuWrap/Makefile)
 
