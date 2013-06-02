@@ -1,0 +1,39 @@
+****************************************************
+*                                                  *
+*    GtkSu ©K.D.Hedger 2013                        *
+*                                                  *
+*    kdhedger68713@gmail.com                       *
+*                                                  *
+*                                                  *
+*                                                  *
+*                                                  *
+****************************************************
+
+
+Gtksu - what is it?
+
+Simple its a simple replacemnet for gksu/ktsuss etc that alows you to run a program with diferrent priviliges ( root etc ).
+
+Although there are other programs of theis type most if not all rely on polkit or have a large number of dependencies, apps like ktsuss which this app was inspired by ( avaiable here:http://ktsuss.googlecode.com/files/ktsuss-2.tar.gz ), some like ktsuss seem to have been abandoned ( last commit was 2011 ).
+
+Also it seems that whenever polkit ( which is a nightmare! ) is updated these programs break, so this is the result there are few dependencies a reasonable recent gtk and glib and thats it.
+
+Installation
+
+Just run ./Autogen.sh from this folder then make and sudo make install.
+To install to ( say ) /usr instead of the default /usr/local, add --prefix=/usr, --enable-ktsuss-link will as it says link ktsuss to gtksu so that some programs that hard code the files think that ktsuss is being used ( spacefm ).
+
+Usage:
+
+gtksu [OPTION] [--] <command>
+Run a command as another user
+-u, --user USER			Runs the command as the given user
+-m, --message MESG		Change default message in ktsuss window
+
+Simple usage:
+gtksu terminal.
+
+If you need to add options use -- like so:
+gtksu -u root -- terminal --hold -x ls -AF /
+
+Bugs etc to the above email address.
