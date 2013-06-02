@@ -36,4 +36,7 @@ gtksu terminal.
 If you need to add options use -- like so:
 gtksu -u root -- terminal --hold -x ls -AF /
 
+This programme has the potential to hose your system if used unwisely, BE WARNED!
+May present a security risk so use at your own risk.
+
 Bugs etc to the above email address.
