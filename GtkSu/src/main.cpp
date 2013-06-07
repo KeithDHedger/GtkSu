@@ -18,7 +18,7 @@
 
 #include <getopt.h>
 
-#define		VERSION "0.0.5"
+#define		VERSION "0.0.6"
 #define		MYEMAIL "kdhedger68713@gmail.com"
 
 #define		NOSHADOWUSER -1
