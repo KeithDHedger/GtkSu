@@ -2,7 +2,7 @@
 
 #©keithhedger Wed 22 May 19:55:26 BST 2013 kdhedger68713@gmail.com
 
-VERSION="0.0.5"
+VERSION="0.0.6"
 
 svn commit -m ""
 cd /tmp
