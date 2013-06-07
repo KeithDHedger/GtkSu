@@ -1,0 +1,4 @@
+0.0.5 First release into the wild.
+
+0.0.6 Fixed a bug where '--' used to mark end of options used when no options.
+Removed debugging messages.
