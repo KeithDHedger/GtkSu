@@ -27,8 +27,10 @@ GtkWidget*	window=NULL;
 GtkWidget*	nameEntry=NULL;
 GtkWidget*	passEntry=NULL;
 
-int			gargc;
+//int			gargc;
 char**		gargv;
+GString*	commandStr=g_string_new(NULL);
+
 char*		whereFrom;
 char*		hashedPass=NULL;
 char*		userName=NULL;
@@ -54,10 +56,7 @@ int runAsUser(int theuid,char*user,char* hashedpass)
 {
 	GString*	str=g_string_new(NULL);
 
-	g_string_append_printf(str,"%s/gtksuwrap %i '%s' '%s'",whereFrom,theuid,user,hashedpass);
-
-	for(int k=optind;k<gargc;k++)
-		g_string_append_printf(str," \"%s\"",gargv[k]);
+	g_string_append_printf(str,"%s/gtksuwrap %i '%s' '%s' %s",whereFrom,theuid,user,hashedpass,commandStr->str);
 
 	system(str->str);
 	g_string_free(str,true);
@@ -107,20 +106,13 @@ void doButton(GtkWidget* widget,gpointer data)
 					if(fp!=NULL)
 						{
 							fgets(buffer,255,fp);
-					//		if(strlen(buffer)>0)
-					//		{
 							buffer[strlen(buffer)-1]=0;
 							pclose(fp);
 							asprintf(&hashedPass,"%s",buffer);
 							resulthash=crypt((char*)gtk_entry_get_text((GtkEntry*)passEntry),hashedPass);
 
-//if(hashedPass==NULL)
-//printf("AAA\n");
-//if(resulthash==NULL)
-//printf("bbbbbb\n");
 							if((resulthash!=NULL) && (strcmp(hashedPass,resulthash)==0))
 								{
-					printf("ZZZZZ%s\n%s\n",hashedPass,resulthash);
 									itworked=runAsUser(uid,(char*)gtk_entry_get_text((GtkEntry*)nameEntry),resulthash);
 									if(itworked==0)
 										shutdown(NULL,NULL);
@@ -131,7 +123,6 @@ void doButton(GtkWidget* widget,gpointer data)
 								{
 									doErrorMessage("Could not run ",gargv[1],"Username and/or Password incorrect");
 								}
-							//}
 						}
 					return;
 				}
@@ -204,9 +195,11 @@ int main(int argc,char **argv)
 			}
 		}
 
-	gargc=argc;
 	gargv=argv;
 	getPath();
+
+	for(int j=optind;j<argc;j++)
+		g_string_append_printf(commandStr," \"%s\"",argv[j]);
 
 	gtk_init(&argc,&argv);
 
