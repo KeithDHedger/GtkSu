@@ -27,7 +27,6 @@ GtkWidget*	window=NULL;
 GtkWidget*	nameEntry=NULL;
 GtkWidget*	passEntry=NULL;
 
-//int			gargc;
 char**		gargv;
 GString*	commandStr=g_string_new(NULL);
 
