@@ -81,8 +81,6 @@ void doButton(GtkWidget* widget,gpointer data)
 	char*		resulthash=NULL;
 	int			uid;
 	int			itworked;
-	GtkWidget*	message;
-	int			serrno=-1;
 
 	if((bool)data==false)
 		shutdown(NULL,NULL);
@@ -100,7 +98,6 @@ void doButton(GtkWidget* widget,gpointer data)
 					buffer[0]=0;
 					asprintf(&command,"%s/gtksuwrap gethash %s",whereFrom,(char*)gtk_entry_get_text((GtkEntry*)nameEntry));
 					fp=popen(command,"r");
-					serrno=errno;
 					g_free(command);
 					if(fp!=NULL)
 						{
