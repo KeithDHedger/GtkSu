@@ -10,7 +10,7 @@ svn co file:///home/keithhedger/Development/SVN/GtkSu
 find GtkSu -name ".svn" -exec rm -r '{}' \; || true
 rm /tmp/GtkSu/makepkg
 
-mv /tmp/KKEdit /tmp/GtkSu-${VERSION}
+mv /tmp/GtkSu /tmp/GtkSu-${VERSION}
 cd /tmp/GtkSu-${VERSION}
 
 ./remakesourcelist
