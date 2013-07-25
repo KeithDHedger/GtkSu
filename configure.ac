@@ -1,6 +1,6 @@
 #
 #
-AC_INIT([GtkSu],[0.0],[PROJ],[GtkSu])
+AC_INIT([GtkSu],[0.0.7],[PROJ],[GtkSu])
 
 AC_CONFIG_HEADER([config.h])
 AC_PROG_CXX

@@ -2,12 +2,26 @@
 
 #©keithhedger Wed 22 May 19:55:26 BST 2013 kdhedger68713@gmail.com
 
-VERSION="0.0.6"
+VERSION="0.0.7"
 
 svn commit -m ""
 cd /tmp
 svn co file:///home/keithhedger/Development/SVN/GtkSu
 find GtkSu -name ".svn" -exec rm -r '{}' \; || true
 rm /tmp/GtkSu/makepkg
+
+mv /tmp/KKEdit /tmp/GtkSu-${VERSION}
+cd /tmp/GtkSu-${VERSION}
+
+./remakesourcelist
+aclocal
+autoheader
+touch NEWS README AUTHORS
+automake --add-missing --copy
+autoconf
+rm -rf ./autom4te.cache
+rm ./compile ./missing ./COPYING ./AUTHORS ./NEWS ./README
+cd ..
+
 tar -czvf GtkSu-${VERSION}.tar.gz GtkSu
 rm -r /tmp/GtkSu
