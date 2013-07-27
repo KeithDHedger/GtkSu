@@ -6,7 +6,7 @@ VERSION="0.0.7"
 
 svn commit -m ""
 cd /tmp
-//svn co file:///media/LinuxData/Development/SVN/GtkSu
+svn co file:///media/LinuxData/Development/SVN/GtkSu
 find GtkSu -name ".svn" -exec rm -r '{}' \; || true
 rm /tmp/GtkSu/makepkg
 
