@@ -25,4 +25,4 @@ rm ./compile ./missing ./COPYING ./AUTHORS ./NEWS ./README
 cd ..
 
 tar -czvf GtkSu-${VERSION}.tar.gz GtkSu-${VERSION}
-rm -r /tmp/GtkSu
+rm -r /tmp/GtkSu-${VERSION}
