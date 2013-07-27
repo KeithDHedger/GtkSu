@@ -1,4 +1,11 @@
-0.0.5 First release into the wild.
+0.0.7 
+Added install instructions for debian/fedora users including dependenxies.
+Added 'configure' file etc so now no longer depends on autotools.
 
-0.0.6 Fixed a bug where '--' used to mark end of options used when no options.
+0.0.6
+Fixed a bug where '--' used to mark end of options used when no options.
 Removed debugging messages.
+
+0.0.5
+First release into the wild.
+
