@@ -14,6 +14,7 @@ make
 sudo make install
 
 Add --prefix=/usr etc to change the default installation from /usr/local
+Add --enable-ktsuss-link to create a symlink from ktsuss to gtksu.
 
 ******************
 
