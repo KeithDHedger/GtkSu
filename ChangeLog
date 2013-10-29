@@ -1,3 +1,7 @@
+0.0.8
+Fixed install of zipped manpage.
+Fixed wrong version number being picked up.
+
 0.0.7 
 Added install instructions for debian/fedora users including dependenxies.
 Added 'configure' file etc so now no longer depends on autotools.
