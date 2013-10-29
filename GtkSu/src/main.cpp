@@ -15,10 +15,10 @@
 #include <pwd.h>
 #include <shadow.h>
 #include <crypt.h>
-
 #include <getopt.h>
 
-#define		VERSION "0.0.6"
+#include "config.h"
+
 #define		MYEMAIL "kdhedger68713@gmail.com"
 
 #define		NOSHADOWUSER -1

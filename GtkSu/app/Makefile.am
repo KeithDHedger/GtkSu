@@ -15,7 +15,7 @@ scriptfiles_SCRIPTS = ../resources/scripts/README
 
 bin_PROGRAMS = gtksu
 
-man1_MANS = ../resources/man/gtksu.1
+man1_MANS = ../resources/man/gtksu.1.gz
   
 if KTSUSSLINK
 ktsuss = "makelink"
