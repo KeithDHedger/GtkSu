@@ -37,6 +37,8 @@ char*		bodyMessage=NULL;
 
 GString*	runOptions=g_string_new(NULL);
 
+int			returnValFromApp=-1;
+
 struct option long_options[]=
 	{
 		{"version",0,0,'v'},
@@ -57,7 +59,7 @@ int runAsUser(int theuid,char*user,char* hashedpass)
 
 	g_string_append_printf(str,"%s/gtksuwrap %i '%s' '%s' %s",whereFrom,theuid,user,hashedpass,commandStr->str);
 
-	system(str->str);
+	returnValFromApp=system(str->str);
 	g_string_free(str,true);
 	shutdown(NULL,NULL);
 	return(0);
@@ -148,6 +150,7 @@ void getPath(void)
 
 int main(int argc,char **argv)
 {
+
 	GtkWidget*	vbox;
 	GtkWidget*	hbox;
 	GtkWidget*	buttonok;
@@ -252,7 +255,7 @@ int main(int argc,char **argv)
 	gtk_widget_grab_focus(passEntry);
 	gtk_main();
 
-	return(0);
+	return(returnValFromApp);
 }
 
 

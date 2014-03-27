@@ -25,67 +25,67 @@ static uid_t orig_euid=-1;
 
 void drop_privileges(int permanent)
 {
-    if (geteuid() != 0)
-        return;
+	if (geteuid()!=0)
+		return;
 
-    if (orig_euid==-1)
-    {
-        orig_euid=geteuid();
-        orig_egid=getegid();
-        orig_ruid=getuid();
-        orig_rgid=getgid();
-        orig_ngroups=getgroups(NGROUPS_MAX, orig_groups);
-    }
+	if (orig_euid==-1)
+		{
+			orig_euid=geteuid();
+			orig_egid=getegid();
+			orig_ruid=getuid();
+			orig_rgid=getgid();
+			orig_ngroups=getgroups(NGROUPS_MAX,orig_groups);
+		}
 
-    // drop groups
-    /* If root privileges are to be dropped, be sure to pare down the ancillary
-    * groups for the process before doing anything else because the setgroups(  )
-    * system call requires root privileges.  Drop ancillary groups regardless of
-    * whether privileges are being dropped temporarily or permanently.
-    */
-    gid_t newgid=orig_rgid;
-    setgroups(1, &newgid);
+// drop groups
+/* If root privileges are to be dropped, be sure to pare down the ancillary
+* groups for the process before doing anything else because the setgroups(  )
+* system call requires root privileges.  Drop ancillary groups regardless of
+* whether privileges are being dropped temporarily or permanently.
+*/
 
+	gid_t newgid=orig_rgid;
+	setgroups(1,&newgid);
 
-    if (setregid(permanent ? newgid : -1, newgid)==-1) goto _drop_abort;
+	if (setregid(permanent ? newgid : -1,newgid)==-1) goto _drop_abort;
 
     // drop user
-    if (setreuid((permanent ? orig_ruid : -1), orig_ruid)==-1) goto _drop_abort;
-
+	if (setreuid((permanent ? orig_ruid : -1),orig_ruid)==-1) goto _drop_abort;
 
     // verify if not originally root
-	if (orig_ruid != 0)
-	{
-		if (permanent)
-			{
-				if ((setegid(0)!=-1) || (getegid()!=newgid))
-					goto _drop_abort;
-				if ((seteuid(0)!=-1) || (geteuid()!=orig_ruid))
-					goto _drop_abort;
-			}
-		else
-			{
-				if (getegid()!=newgid)
-					goto _drop_abort;
-				if (geteuid()!=orig_ruid)
-					goto _drop_abort;
-			}
-	}
+	if (orig_ruid!=0)
+		{
+			if (permanent)
+				{
+					if ((setegid(0)!=-1) || (getegid()!=newgid))
+						goto _drop_abort;
+					if ((seteuid(0)!=-1) || (geteuid()!=orig_ruid))
+						goto _drop_abort;
+				}
+			else
+				{
+					if (getegid()!=newgid)
+						goto _drop_abort;
+					if (geteuid()!=orig_ruid)
+						goto _drop_abort;
+				}
+		}
 
-    return;
+	return;
+
 _drop_abort:
-	printf("udevil: error 1: unable to drop priviledges - please report this problem\n");
+	printf("gtksuwrap: error 1: unable to drop priviledges - please report this problem\n");
     abort();
 }
 
 void restore_privileges(void)
 {
-    if (orig_euid != 0)
-        return;
+	if (orig_euid!=0)
+		return;
 
-    seteuid(0);
-    setegid(orig_egid);
-    setgroups(orig_ngroups, orig_groups);
+	seteuid(0);
+	setegid(orig_egid);
+	setgroups(orig_ngroups,orig_groups);
 }
 
 int checkPasswd(char* username,char* hashedpass)
@@ -120,7 +120,7 @@ int sendHashBack(char* username)
 		}
 }
 
-int main(int argc, char **argv)
+int main(int argc,char **argv)
 {
 	int			j;
 	GString*	str;
@@ -146,11 +146,11 @@ int main(int argc, char **argv)
 			g_string_append_printf(str," &");
 			restore_privileges();
 				setresuid(theuid,theuid,theuid);
-				system(str->str);
+				retval=system(str->str);
 			drop_privileges(0);
 			g_string_free(str,true);
 			sleep(1);
-			return(0);
+			return(retval);
 		}
 	else
 		{
