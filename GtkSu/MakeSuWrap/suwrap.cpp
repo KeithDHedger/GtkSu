@@ -125,6 +125,23 @@ int sendHashBack(char* username)
 		}
 }
 
+const char* unsetVars[]=
+{
+};
+
+
+const char* setVars[]=
+{
+};
+
+
+void cleanEnv(void)
+{
+	setenv("PATH",_PATH_STDPATH,1);
+
+}
+
+
 int main(int argc,char **argv)
 {
 	int			j;
@@ -132,9 +149,8 @@ int main(int argc,char **argv)
 	int			theuid;
 	int			retval;
 
-
-
 	drop_privileges(0);
+	cleanEnv();
 
 	theuid=atoi(argv[1]);
 	str=g_string_new(NULL);
@@ -149,9 +165,9 @@ int main(int argc,char **argv)
 		{		
 			for(j=4;j<argc;j++)
 				g_string_append_printf(str," \"%s\"",argv[j]);
-
 			restore_privileges();
 				setresuid(theuid,theuid,theuid);
+printf("%s\n",getenv("PATH"));
 				retFromApp=system(str->str);
 			drop_privileges(0);
 
