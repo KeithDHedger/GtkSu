@@ -11,7 +11,8 @@
 #include <gtk/gtk.h>
 #include <sys/stat.h>
 #include <errno.h>
-
+ #include <sys/wait.h> 
+ 
 #include <pwd.h>
 #include <shadow.h>
 #include <crypt.h>
@@ -59,9 +60,14 @@ int runAsUser(int theuid,char*user,char* hashedpass)
 
 	g_string_append_printf(str,"%s/gtksuwrap %i '%s' '%s' %s",whereFrom,theuid,user,hashedpass,commandStr->str);
 
+	gtk_widget_hide(window);
+	while(gtk_events_pending())
+		gtk_main_iteration_do(false);
+
 	returnValFromApp=system(str->str);
+
 	g_string_free(str,true);
-	shutdown(NULL,NULL);
+
 	return(0);
 }
 
@@ -150,7 +156,6 @@ void getPath(void)
 
 int main(int argc,char **argv)
 {
-
 	GtkWidget*	vbox;
 	GtkWidget*	hbox;
 	GtkWidget*	buttonok;
@@ -255,7 +260,7 @@ int main(int argc,char **argv)
 	gtk_widget_grab_focus(passEntry);
 	gtk_main();
 
-	return(returnValFromApp);
+	return(WEXITSTATUS(returnValFromApp));
 }
 
 

@@ -7,7 +7,8 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <grp.h>
-
+#include <sys/wait.h> 
+ 
 #include <pwd.h>
 #include <shadow.h>
 #include <crypt.h>
@@ -23,13 +24,17 @@ static uid_t orig_ruid=-1;
 static gid_t orig_egid=-1;
 static uid_t orig_euid=-1;
 
+bool	firstRun=true;
+int retFromApp=77;
+
 void drop_privileges(int permanent)
 {
 	if (geteuid()!=0)
 		return;
 
-	if (orig_euid==-1)
+	if (firstRun==true)
 		{
+			firstRun=false;
 			orig_euid=geteuid();
 			orig_egid=getegid();
 			orig_ruid=getuid();
@@ -127,6 +132,8 @@ int main(int argc,char **argv)
 	int			theuid;
 	int			retval;
 
+
+
 	drop_privileges(0);
 
 	theuid=atoi(argv[1]);
@@ -139,21 +146,21 @@ int main(int argc,char **argv)
 		}
 
 	if(checkPasswd(argv[2],argv[3])==0)
-		{
+		{		
 			for(j=4;j<argc;j++)
 				g_string_append_printf(str," \"%s\"",argv[j]);
 
-			g_string_append_printf(str," &");
 			restore_privileges();
 				setresuid(theuid,theuid,theuid);
-				retval=system(str->str);
+				retFromApp=system(str->str);
 			drop_privileges(0);
+
 			g_string_free(str,true);
-			sleep(1);
-			return(retval);
+
+			return(WEXITSTATUS(retFromApp));
 		}
 	else
 		{
-			return(-200);
+			return(200);
 		}
 }
