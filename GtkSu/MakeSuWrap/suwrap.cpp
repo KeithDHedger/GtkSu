@@ -125,22 +125,52 @@ int sendHashBack(char* username)
 		}
 }
 
-const char* unsetVars[]=
+//const char* unsetVars[]=
+//{
+//};
+
+struct passwd*	pwdata;
+
+const char* setVars[][2]=
 {
+  {"IFS"," \t\n"},
+  {"PATH",_PATH_STDPATH},
+  {NULL,NULL}
 };
 
 
-const char* setVars[]=
+char*	userHome;
+char*	userName;
+char*	userShell;
+char*	userDisplay;
+char*	userXAuth;
+
+void keepEnvs(int theuid)
 {
-};
-
-
-void cleanEnv(void)
-{
-	setenv("PATH",_PATH_STDPATH,1);
-
+	pwdata=getpwuid(theuid);
+	userHome=pwdata->pw_dir;
+	userName=pwdata->pw_name;
+	userShell=pwdata->pw_shell;
+	userDisplay=getenv("DISPLAY");
+	userXAuth=getenv("XAUTHORITY");
 }
 
+void cleanEnv(int theuid)
+{
+	keepEnvs(theuid);
+	clearenv();
+	if(theuid==0)
+		setenv("PATH",_PATH_STDPATH,1);
+	else
+		setenv("PATH",_PATH_DEFPATH,1);
+
+	setenv("IFS"," \t\n",1);
+	setenv("HOME",userHome,1);
+	setenv("USERNAME",userName,1);
+	setenv("SHELL",userShell,1);
+	setenv("DISPLAY",userDisplay,1);
+	setenv("XAUTHORITY",userXAuth,1);
+}
 
 int main(int argc,char **argv)
 {
@@ -150,24 +180,26 @@ int main(int argc,char **argv)
 	int			retval;
 
 	drop_privileges(0);
-	cleanEnv();
+	cleanEnv(geteuid());
 
 	theuid=atoi(argv[1]);
 	str=g_string_new(NULL);
 
-	if(strcmp(argv[1],"gethash")==0)
+	if(strncmp(argv[1],"gethash",7)==0)
 		{	
 			retval=sendHashBack(argv[2]);
 			return(retval);
 		}
 
+
 	if(checkPasswd(argv[2],argv[3])==0)
 		{		
 			for(j=4;j<argc;j++)
 				g_string_append_printf(str," \"%s\"",argv[j]);
+
 			restore_privileges();
 				setresuid(theuid,theuid,theuid);
-printf("%s\n",getenv("PATH"));
+				cleanEnv(geteuid());
 				retFromApp=system(str->str);
 			drop_privileges(0);
 

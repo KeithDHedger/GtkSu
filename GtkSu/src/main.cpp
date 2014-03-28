@@ -161,6 +161,11 @@ int main(int argc,char **argv)
 	GtkWidget*	buttonok;
 	GtkWidget*	button;
 
+//system("/usr/bin/env");
+//printf("\n\nXXXXXXXXXXXXXXXXXXX\n\n");
+//clearenv();
+//system("/usr/bin/env");
+//exit(0);
 	int c;
 	int option_index=0;
 
