@@ -189,33 +189,36 @@ void makeXauthFile(void)
 	FILE*	fp;
 	char	buffer[1024];
 	char*	display;
-	char*	displayEnv;
+//	char*	displayEnv;
 	char*	key;
+	char*	endPtr;
 
-	displayEnv=getenv("DISPLAY");
-	
-	asprintf(&command,"xauth list %s|head -1 | awk '{ print $1 }'",displayEnv);
+//	displayEnv=getenv("DISPLAY");
+
+	asprintf(&command,"xauth list %s|head -1",userDisplay);
 	fp=popen(command, "r");
 	fgets(buffer,1023,fp);
 	buffer[1023]=0;
 	pclose(fp);
-	display=strdup(buffer);
 
-	asprintf(&command,"xauth list %s|head -1 | awk '{ print $3 }'",displayEnv);
-	fp=popen(command, "r");
-	fgets(buffer,1023,fp);
-	buffer[1023]=0;
-	pclose(fp);
-	key=strdup(buffer);
+	endPtr=strrchr(buffer,' ');
+	endPtr--;
+	key=strndup(endPtr,strlen(endPtr)-1);
 
-	asprintf(&command,"xauth -f /tmp/txauth add \"%s\" . \"%s\"",display,key);
+	endPtr=strchr(buffer,' ');
+	*endPtr=0;
+	display=strndup(buffer,strlen(buffer));
+
+	asprintf(&command,"xauth -f /tmp/txauth add \"%s\" . \"%s\" &>/dev/null",display,key);
+	system(command);
 }
 
 void cleanEnv(int theuid)
 {
-	makeXauthFile();
 
 	keepEnvs(theuid);
+	makeXauthFile();
+
 	if(clearenv()!=0)
 		{
 			fprintf(stderr,"Can't clean environment, aborting ...");
