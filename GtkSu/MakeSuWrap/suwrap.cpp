@@ -173,6 +173,14 @@ void cleanEnv(int theuid)
 	setenv("LC_ALL",userLcAll,1);
 	setenv("LC_COLLATE",userLCCol,1);
 	setenv("LC_CTYPE",userLCCType,1);
+	if(chdir(userHome)!=0)
+		{
+			if(chdir("/")!=0)
+				{
+					printf("Can't change PWD, aborting ...");
+					abort();
+				}
+		}
 }
 
 int main(int argc,char **argv)
@@ -193,7 +201,6 @@ int main(int argc,char **argv)
 			retval=sendHashBack(argv[2]);
 			return(retval);
 		}
-
 
 	if(checkPasswd(argv[2],argv[3])==0)
 		{		
