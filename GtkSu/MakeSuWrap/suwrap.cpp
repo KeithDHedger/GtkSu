@@ -17,15 +17,28 @@
 #define	VERSION 0.1.0
 #define	NOSHADOWUSER -1
 
-static int   orig_ngroups=-1;
-static gid_t orig_groups[NGROUPS_MAX];
-static gid_t orig_rgid=-1;
-static uid_t orig_ruid=-1;
-static gid_t orig_egid=-1;
-static uid_t orig_euid=-1;
+static int		orig_ngroups=-1;
+static gid_t	orig_groups[NGROUPS_MAX];
+static gid_t	orig_rgid=-1;
+static uid_t	orig_ruid=-1;
+static gid_t	orig_egid=-1;
+static uid_t	orig_euid=-1;
 
-bool	firstRun=true;
-int retFromApp=77;
+bool			firstRun=true;
+int				retFromApp=-1;
+char*			userHome;
+char*			userName;
+char*			userShell;
+char*			userDisplay;
+char*			userXAuth;
+char*			userTz;
+char*			userLang;
+char*			userLcAll;
+char*			userLCCol;
+char*			userLCCType;
+
+struct passwd*	pwdata;
+extern char **environ;
 
 void drop_privileges(int permanent)
 {
@@ -125,26 +138,6 @@ int sendHashBack(char* username)
 		}
 }
 
-//const char* unsetVars[]=
-//{
-//};
-
-struct passwd*	pwdata;
-
-const char* setVars[][2]=
-{
-  {"IFS"," \t\n"},
-  {"PATH",_PATH_STDPATH},
-  {NULL,NULL}
-};
-
-
-char*	userHome;
-char*	userName;
-char*	userShell;
-char*	userDisplay;
-char*	userXAuth;
-
 void keepEnvs(int theuid)
 {
 	pwdata=getpwuid(theuid);
@@ -153,6 +146,11 @@ void keepEnvs(int theuid)
 	userShell=pwdata->pw_shell;
 	userDisplay=getenv("DISPLAY");
 	userXAuth=getenv("XAUTHORITY");
+	userTz=getenv("TZ");
+	userLang=getenv("LANG");
+	userLcAll=getenv("LC_ALL");
+	userLCCol=getenv("LC_COLLATE");
+	userLCCType=getenv("LC_CTYPE");
 }
 
 void cleanEnv(int theuid)
@@ -170,6 +168,11 @@ void cleanEnv(int theuid)
 	setenv("SHELL",userShell,1);
 	setenv("DISPLAY",userDisplay,1);
 	setenv("XAUTHORITY",userXAuth,1);
+	setenv("TZ",userTz,1);
+	setenv("LANG",userLang,1);
+	setenv("LC_ALL",userLcAll,1);
+	setenv("LC_COLLATE",userLCCol,1);
+	setenv("LC_CTYPE",userLCCType,1);
 }
 
 int main(int argc,char **argv)
