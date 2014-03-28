@@ -92,7 +92,7 @@ void drop_privileges(int permanent)
 	return;
 
 _drop_abort:
-	printf("gtksuwrap: error 1: unable to drop priviledges - please report this problem\n");
+	fprintf(stderr,"gtksuwrap: error 1: unable to drop priviledges - please report this problem\n");
     abort();
 }
 
@@ -156,7 +156,12 @@ void keepEnvs(int theuid)
 void cleanEnv(int theuid)
 {
 	keepEnvs(theuid);
-	clearenv();
+	if(clearenv()!=0)
+		{
+			fprintf(stderr,"Can't clean environment, aborting ...");
+			abort();
+		}
+		
 	if(theuid==0)
 		setenv("PATH",_PATH_STDPATH,1);
 	else
@@ -177,7 +182,7 @@ void cleanEnv(int theuid)
 		{
 			if(chdir("/")!=0)
 				{
-					printf("Can't change PWD, aborting ...");
+					fprintf(stderr,"Can't change PWD, aborting ...");
 					abort();
 				}
 		}
