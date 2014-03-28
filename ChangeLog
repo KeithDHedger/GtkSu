@@ -1,3 +1,12 @@
+0.1.0
+CD to users home or "/" before running command.
+Only roots PATH now includes /sbin and /usr/sbin.
+Cleaned environment before switching user.
+Returns exit status of su'ed program.
+Aborts if environment can't be cleaned or permissions can't be dropped.
+Permissions in suwrap program only elevated when needed.
+Fixed make asking for admin password.
+
 0.0.8
 Fixed install of zipped manpage.
 Fixed wrong version number being picked up.

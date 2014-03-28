@@ -153,6 +153,36 @@ void keepEnvs(int theuid)
 	userLCCType=getenv("LC_CTYPE");
 }
 
+/*
+XAUthorty
+XAUTHORITY=/tmp/zzz
+key=$(xauth list $DISPLAY|head -1 | awk '{ print $3 }')
+xauth add "LFSZen/unix:0" . "$key"
+
+
+THIS
+key=$(xauth list $DISPLAY|head -1 | awk '{ print $3 }')
+=key=4b1c76f9627ce99db6f41607aba45848
+
+#disp=xauth list $DISPLAY|head -1 | awk '{ print $1 }'
+#=disp=LFSZen/unix:0
+#xauth -f /tmp/txauth add "LFSZen/unix:0" . "$key"
+
+xauth -f /tmp/txauth add ":0" . "$key"
+XAUTHORITY=/tmp/txauth
+
+
+
+fin
+
+disp=xauth list $DISPLAY|head -1 | awk '{ print $1 }'
+.:. disp=LFSZen/unix:0
+key=key=$(xauth list $DISPLAY|head -1 | awk '{ print $3 }')
+.:. key=4b1c76f9627ce99db6f41607aba45848
+xauth -f /tmp/txauth add "$disp" . "$key"
+XAUTHORITY=/tmp/txauth
+*/
+
 void cleanEnv(int theuid)
 {
 	keepEnvs(theuid);

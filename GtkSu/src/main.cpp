@@ -11,7 +11,6 @@
 #include <gtk/gtk.h>
 #include <sys/stat.h>
 #include <errno.h>
- #include <sys/wait.h> 
  
 #include <pwd.h>
 #include <shadow.h>
