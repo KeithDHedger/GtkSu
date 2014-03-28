@@ -183,8 +183,38 @@ xauth -f /tmp/txauth add "$disp" . "$key"
 XAUTHORITY=/tmp/txauth
 */
 
+void makeXauthFile(void)
+{
+	char*	command;
+	FILE*	fp;
+	char	buffer[1024];
+	char*	display;
+	char*	displayEnv;
+	char*	key;
+
+	displayEnv=getenv("DISPLAY");
+	
+	asprintf(&command,"xauth list %s|head -1 | awk '{ print $1 }'",displayEnv);
+	fp=popen(command, "r");
+	fgets(buffer,1023,fp);
+	buffer[1023]=0;
+	pclose(fp);
+	display=strdup(buffer);
+
+	asprintf(&command,"xauth list %s|head -1 | awk '{ print $3 }'",displayEnv);
+	fp=popen(command, "r");
+	fgets(buffer,1023,fp);
+	buffer[1023]=0;
+	pclose(fp);
+	key=strdup(buffer);
+
+	asprintf(&command,"xauth -f /tmp/txauth add \"%s\" . \"%s\"",display,key);
+}
+
 void cleanEnv(int theuid)
 {
+	makeXauthFile();
+
 	keepEnvs(theuid);
 	if(clearenv()!=0)
 		{
@@ -202,7 +232,7 @@ void cleanEnv(int theuid)
 	setenv("USERNAME",userName,1);
 	setenv("SHELL",userShell,1);
 	setenv("DISPLAY",userDisplay,1);
-	setenv("XAUTHORITY",userXAuth,1);
+	setenv("XAUTHORITY","/tmp/txauth",1);
 	setenv("TZ",userTz,1);
 	setenv("LANG",userLang,1);
 	setenv("LC_ALL",userLcAll,1);
@@ -247,7 +277,7 @@ int main(int argc,char **argv)
 				cleanEnv(geteuid());
 				retFromApp=system(str->str);
 			drop_privileges(0);
-
+			unlink("/tmp/txauth");
 			g_string_free(str,true);
 
 			return(WEXITSTATUS(retFromApp));
