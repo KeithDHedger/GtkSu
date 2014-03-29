@@ -15,12 +15,12 @@
 #include <gtk/gtk.h>
 
 #define	VERSION 0.1.0
-#define	NOSHADOWUSER -1
-#define CANTDROPPRIVS 100
-#define NOXAUTHBIN 101
-#define NOCLEANENV 102
-#define CANTCHDIR 103
-#define BADPASSWD 104
+#define	NOSHADOWUSER 255
+#define CANTDROPPRIVS 254
+#define NOXAUTHBIN 253
+#define NOCLEANENV 252
+#define CANTCHDIR 251
+#define BADPASSWD 250
 
 static int		orig_ngroups=-1;
 static gid_t	orig_groups[NGROUPS_MAX];
@@ -185,7 +185,7 @@ void makeXauthFile(void)
 	xauthDir=mkdtemp(tname);
 	asprintf(&xauthFile,"%s/.Xauthority",xauthDir);
 
-	asprintf(&command,"%s list %s|head -1",xauthBin,PathuserDisplay);
+	asprintf(&command,"%s list %s|head -1",xauthBinPath,userDisplay);
 	fp=popen(command, "r");
 	fgets(buffer,1024,fp);
 	pclose(fp);
@@ -198,7 +198,7 @@ void makeXauthFile(void)
 	*endPtr=0;
 	display=strndup(buffer,strlen(buffer));
 
-	asprintf(&command,"%s -f %s add \"%s\" . \"%s\" &>/dev/null",xauthBin,xauthFile,display,key);
+	asprintf(&command,"%s -f %s add \"%s\" . \"%s\" &>/dev/null",xauthBinPath,xauthFile,display,key);
 	system(command);
 }
 

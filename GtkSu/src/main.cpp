@@ -160,11 +160,6 @@ int main(int argc,char **argv)
 	GtkWidget*	buttonok;
 	GtkWidget*	button;
 
-//system("/usr/bin/env");
-//printf("\n\nXXXXXXXXXXXXXXXXXXX\n\n");
-//clearenv();
-//system("/usr/bin/env");
-//exit(0);
 	int c;
 	int option_index=0;
 
@@ -189,7 +184,7 @@ int main(int argc,char **argv)
 						break;
 
 					case 'v':
-						printf("GtkSu Version %s \nCopyright K.D.Hedger 2013, %s\n",VERSION,MYEMAIL);
+						printf("GtkSu Version %s \nCopyright K.D.Hedger 2013-2014, %s\n",VERSION,MYEMAIL);
 						return 0;
 						break;
 
