@@ -39,6 +39,8 @@ char*			userLCCType;
 
 struct passwd*	pwdata;
 extern char **environ;
+char*			xauthDir=NULL;
+char*			xauthFile=NULL;
 
 void drop_privileges(int permanent)
 {
@@ -183,7 +185,7 @@ xauth -f /tmp/txauth add "$disp" . "$key"
 XAUTHORITY=/tmp/txauth
 */
 
-void makeXauthFile(void)
+void makeXauthFileX(void)
 {
 	char*	command;
 	FILE*	fp;
@@ -213,11 +215,44 @@ void makeXauthFile(void)
 	system(command);
 }
 
-void cleanEnv(int theuid)
+
+void makeXauthFile(void)
+{
+	char*	command;
+	FILE*	fp;
+	char	buffer[1024]={0,};
+	char*	display;
+	char*	key;
+	char*	endPtr;
+	gchar	tname[]="/tmp/GtkSu-XXXXXX";
+
+	xauthDir=mkdtemp(tname);
+	asprintf(&xauthFile,"%s/.Xauthority",xauthDir);
+
+	asprintf(&command,"xauth list %s|head -1",userDisplay);
+	fp=popen(command, "r");
+	fgets(buffer,1024,fp);
+	pclose(fp);
+
+	endPtr=strrchr(buffer,' ');
+	endPtr--;
+	key=strndup(endPtr,strlen(endPtr)-1);
+
+	endPtr=strchr(buffer,' ');
+	*endPtr=0;
+	display=strndup(buffer,strlen(buffer));
+
+	asprintf(&command,"xauth -f %s add \"%s\" . \"%s\" &>/dev/null",xauthFile,display,key);
+	system(command);
+}
+
+
+void cleanEnv(int theuid,bool createxauth)
 {
 
 	keepEnvs(theuid);
-	makeXauthFile();
+	if(createxauth==true)
+		makeXauthFile();
 
 	if(clearenv()!=0)
 		{
@@ -235,7 +270,9 @@ void cleanEnv(int theuid)
 	setenv("USERNAME",userName,1);
 	setenv("SHELL",userShell,1);
 	setenv("DISPLAY",userDisplay,1);
-	setenv("XAUTHORITY","/tmp/txauth",1);
+	if(createxauth==true)
+		setenv("XAUTHORITY",xauthFile,1);
+
 	setenv("TZ",userTz,1);
 	setenv("LANG",userLang,1);
 	setenv("LC_ALL",userLcAll,1);
@@ -259,7 +296,7 @@ int main(int argc,char **argv)
 	int			retval;
 
 	drop_privileges(0);
-	cleanEnv(geteuid());
+	cleanEnv(geteuid(),false);
 
 	theuid=atoi(argv[1]);
 	str=g_string_new(NULL);
@@ -277,10 +314,11 @@ int main(int argc,char **argv)
 
 			restore_privileges();
 				setresuid(theuid,theuid,theuid);
-				cleanEnv(geteuid());
+				cleanEnv(geteuid(),true);
 				retFromApp=system(str->str);
+				unlink(xauthFile);
+				rmdir(xauthDir);
 			drop_privileges(0);
-			unlink("/tmp/txauth");
 			g_string_free(str,true);
 
 			return(WEXITSTATUS(retFromApp));
