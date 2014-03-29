@@ -254,12 +254,16 @@ void cleanEnv(int theuid,bool createxauth)
 	if(createxauth==true)
 		makeXauthFile();
 
+#ifdef _GOTCLEARENV_
 	if(clearenv()!=0)
 		{
 			fprintf(stderr,"Can't clean environment, aborting ...");
 			abort();
 		}
-		
+#else
+	environ=NULL;
+#endif
+
 	if(theuid==0)
 		setenv("PATH",_PATH_STDPATH,1);
 	else

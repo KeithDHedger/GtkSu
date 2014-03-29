@@ -43,7 +43,8 @@ AC_ARG_ENABLE(ktsuss-link,
      AM_CONDITIONAL(KTSUSSLINK, test x$ktsuss = xtrue)
 AC_MSG_RESULT($ktsuss)
 
-AC_CHECK_FUNC (clearenv,AC_DEFINE([_GOTCLEARENV_], [], [GtkSu]),[])
+AC_CHECK_FUNC(clearenv,AC_DEFINE([_GOTCLEARENV_], [], [Description]))
 
-AC_OUTPUT(Makefile GtkSu/app/Makefile GtkSu/debug/Makefile GtkSu/MakeSuWrap/Makefile)
+
+AC_OUTPUT(Makefile GtkSu/app/Makefile GtkSu/MakeSuWrap/Makefile)
 
