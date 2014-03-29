@@ -8,9 +8,9 @@ gtksuwrap_CXXFLAGS = -O3 -export-dynamic
 
 bin_PROGRAMS = gtksuwrap
 
-all-local:
-	sudo chown root:root gtksuwrap
-	sudo chmod ug+s gtksuwrap
+#all-local:
+#	sudo chown root:root gtksuwrap
+#	sudo chmod ug+s gtksuwrap
 
 install-exec-hook:
 	sudo chown root:root $(DESTDIR)${prefix}/bin/gtksuwrap

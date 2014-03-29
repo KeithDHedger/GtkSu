@@ -1,4 +1,6 @@
 0.1.0
+Updated manpage.
+Load more error checking.
 CD to users home or "/" before running command.
 Only roots PATH now includes /sbin and /usr/sbin.
 Cleaned environment before switching user.
