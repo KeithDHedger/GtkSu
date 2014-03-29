@@ -1,6 +1,9 @@
 /*
  *
- * K.D.Hedger 2012 <kdhedger68713@gmail.com>
+ * K.D.Hedger 2012-2014 <kdhedger68713@gmail.com>
+ *
+ * All code is suppled 'as is' use it at your own peril!
+ * Released under GPLv3
  *
  */
 

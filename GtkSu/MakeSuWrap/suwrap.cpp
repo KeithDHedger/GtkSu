@@ -1,3 +1,19 @@
+/*
+ *
+ * K.D.Hedger 2012-2014 <kdhedger68713@gmail.com>
+ *
+ * Parts of this code are from udevil.c available here:
+ * https://nodeload.github.com/IgnorantGuru/udevil/zip/master
+ * Mucked about by me :)
+ *
+ * And libgksu.c available here:
+ * http://people.debian.org/~kov/gksu/libgksu-2.0.12.tar.gz
+ * Mucked about by me :)
+ *
+ * All code is suppled 'as is' use it at your own peril!
+ * Released under GPLv3
+ *
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -21,6 +37,8 @@
 #define NOCLEANENV 252
 #define CANTCHDIR 251
 #define BADPASSWD 250
+#define CANTMAKETMPDIR 249
+#define CANTMAKEXAUTHFILE 248
 
 static int		orig_ngroups=-1;
 static gid_t	orig_groups[NGROUPS_MAX];
@@ -43,7 +61,7 @@ char*			userLCCol;
 char*			userLCCType;
 
 struct passwd*	pwdata;
-extern char **environ;
+extern char**	environ;
 char*			xauthDir=NULL;
 char*			xauthFile=NULL;
 
@@ -68,7 +86,6 @@ void drop_privileges(int permanent)
 * system call requires root privileges.  Drop ancillary groups regardless of
 * whether privileges are being dropped temporarily or permanently.
 */
-
 	gid_t newgid=orig_rgid;
 	setgroups(1,&newgid);
 
@@ -183,23 +200,37 @@ void makeXauthFile(void)
 		}
 
 	xauthDir=mkdtemp(tname);
+	if(xauthDir==NULL)
+		exit(CANTMAKETMPDIR);
+
 	asprintf(&xauthFile,"%s/.Xauthority",xauthDir);
 
 	asprintf(&command,"%s list %s|head -1",xauthBinPath,userDisplay);
 	fp=popen(command, "r");
-	fgets(buffer,1024,fp);
-	pclose(fp);
+	if(fp!=NULL)
+		{
+			fgets(buffer,1024,fp);
+			pclose(fp);
+		}
+	else
+		exit(CANTMAKEXAUTHFILE);
 
 	endPtr=strrchr(buffer,' ');
+	if(endPtr==NULL)
+		exit(CANTMAKEXAUTHFILE);
 	endPtr--;
 	key=strndup(endPtr,strlen(endPtr)-1);
 
 	endPtr=strchr(buffer,' ');
+	if(endPtr==NULL)
+		exit(CANTMAKEXAUTHFILE);
 	*endPtr=0;
 	display=strndup(buffer,strlen(buffer));
 
 	asprintf(&command,"%s -f %s add \"%s\" . \"%s\" &>/dev/null",xauthBinPath,xauthFile,display,key);
 	system(command);
+	if(!g_file_test(xauthFile,G_FILE_TEST_EXISTS))
+		exit(CANTMAKEXAUTHFILE);
 }
 
 void cleanEnv(int theuid,bool createxauth)
