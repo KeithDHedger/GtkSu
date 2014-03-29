@@ -16,6 +16,11 @@
 
 #define	VERSION 0.1.0
 #define	NOSHADOWUSER -1
+#define CANTDROPPRIVS 100
+#define NOXAUTHBIN 101
+#define NOCLEANENV 102
+#define CANTCHDIR 103
+#define BADPASSWD 104
 
 static int		orig_ngroups=-1;
 static gid_t	orig_groups[NGROUPS_MAX];
@@ -95,7 +100,7 @@ void drop_privileges(int permanent)
 
 _drop_abort:
 	fprintf(stderr,"gtksuwrap: error 1: unable to drop priviledges - please report this problem\n");
-    abort();
+    exit(CANTDROPPRIVS);
 }
 
 void restore_privileges(void)
@@ -155,81 +160,32 @@ void keepEnvs(int theuid)
 	userLCCType=getenv("LC_CTYPE");
 }
 
-/*
-XAUthorty
-XAUTHORITY=/tmp/zzz
-key=$(xauth list $DISPLAY|head -1 | awk '{ print $3 }')
-xauth add "LFSZen/unix:0" . "$key"
-
-
-THIS
-key=$(xauth list $DISPLAY|head -1 | awk '{ print $3 }')
-=key=4b1c76f9627ce99db6f41607aba45848
-
-#disp=xauth list $DISPLAY|head -1 | awk '{ print $1 }'
-#=disp=LFSZen/unix:0
-#xauth -f /tmp/txauth add "LFSZen/unix:0" . "$key"
-
-xauth -f /tmp/txauth add ":0" . "$key"
-XAUTHORITY=/tmp/txauth
-
-
-
-fin
-
-disp=xauth list $DISPLAY|head -1 | awk '{ print $1 }'
-.:. disp=LFSZen/unix:0
-key=key=$(xauth list $DISPLAY|head -1 | awk '{ print $3 }')
-.:. key=4b1c76f9627ce99db6f41607aba45848
-xauth -f /tmp/txauth add "$disp" . "$key"
-XAUTHORITY=/tmp/txauth
-*/
-
-void makeXauthFileX(void)
-{
-	char*	command;
-	FILE*	fp;
-	char	buffer[1024];
-	char*	display;
-//	char*	displayEnv;
-	char*	key;
-	char*	endPtr;
-
-//	displayEnv=getenv("DISPLAY");
-
-	asprintf(&command,"xauth list %s|head -1",userDisplay);
-	fp=popen(command, "r");
-	fgets(buffer,1023,fp);
-	buffer[1023]=0;
-	pclose(fp);
-
-	endPtr=strrchr(buffer,' ');
-	endPtr--;
-	key=strndup(endPtr,strlen(endPtr)-1);
-
-	endPtr=strchr(buffer,' ');
-	*endPtr=0;
-	display=strndup(buffer,strlen(buffer));
-
-	asprintf(&command,"xauth -f /tmp/txauth add \"%s\" . \"%s\" &>/dev/null",display,key);
-	system(command);
-}
-
-
 void makeXauthFile(void)
 {
-	char*	command;
-	FILE*	fp;
-	char	buffer[1024]={0,};
-	char*	display;
-	char*	key;
-	char*	endPtr;
-	gchar	tname[]="/tmp/GtkSu-XXXXXX";
+	char*		command;
+	FILE*		fp;
+	char		buffer[1024]={0,};
+	char*		display;
+	char*		key;
+	char*		endPtr;
+	gchar		tname[]="/tmp/GtkSu-XXXXXX";
+	const char*	xauthBinPath=NULL;
+
+	if(g_file_test("/usr/bin/xauth",G_FILE_TEST_IS_EXECUTABLE))
+		xauthBinPath="/usr/bin/xauth";
+	if(g_file_test("/usr/X11R6/bin/xauth",G_FILE_TEST_IS_EXECUTABLE))
+		xauthBinPath="/usr/X11R6/bin/xauth";
+
+	if(xauthBinPath==NULL)
+		{
+			fprintf(stderr,"Can't find xauth binary in /usr/bin/ or /usr/X11R6/bin/xauth\n");
+			exit(NOXAUTHBIN);
+		}
 
 	xauthDir=mkdtemp(tname);
 	asprintf(&xauthFile,"%s/.Xauthority",xauthDir);
 
-	asprintf(&command,"xauth list %s|head -1",userDisplay);
+	asprintf(&command,"%s list %s|head -1",xauthBin,PathuserDisplay);
 	fp=popen(command, "r");
 	fgets(buffer,1024,fp);
 	pclose(fp);
@@ -242,14 +198,12 @@ void makeXauthFile(void)
 	*endPtr=0;
 	display=strndup(buffer,strlen(buffer));
 
-	asprintf(&command,"xauth -f %s add \"%s\" . \"%s\" &>/dev/null",xauthFile,display,key);
+	asprintf(&command,"%s -f %s add \"%s\" . \"%s\" &>/dev/null",xauthBin,xauthFile,display,key);
 	system(command);
 }
 
-
 void cleanEnv(int theuid,bool createxauth)
 {
-
 	keepEnvs(theuid);
 	if(createxauth==true)
 		makeXauthFile();
@@ -258,7 +212,7 @@ void cleanEnv(int theuid,bool createxauth)
 	if(clearenv()!=0)
 		{
 			fprintf(stderr,"Can't clean environment, aborting ...");
-			abort();
+			exit(NOCLEANENV);
 		}
 #else
 	environ=NULL;
@@ -287,7 +241,7 @@ void cleanEnv(int theuid,bool createxauth)
 			if(chdir("/")!=0)
 				{
 					fprintf(stderr,"Can't change PWD, aborting ...");
-					abort();
+					exit(CANTCHDIR);
 				}
 		}
 }
@@ -329,6 +283,6 @@ int main(int argc,char **argv)
 		}
 	else
 		{
-			return(200);
+			return(BADPASSWD);
 		}
 }
