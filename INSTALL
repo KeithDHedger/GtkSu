@@ -59,5 +59,20 @@ sudo make install
 
 You may need to adjust package names slightly depending on the version of debian/fedora that you have installed.
 
+If your distro disables the root account ( I'm looking at you Ubuntu! ) you may have to set a root password like so:
+Open a Terminal and type:
+sudo su
+passwd
+
+Enter a new password for root twice you may also have to run these two commands whilst logged in as root:
+
+pwconv
+grpconv
+
+Finally logout
+exit
+
+You can now type roots password in to the GtkSu gui and run commands as root.
+
 Bugs and suggestions welcome please email to kdhedger68713@gmail.com
 For general info on compiling/installing software on your disro see the relevant forums.
