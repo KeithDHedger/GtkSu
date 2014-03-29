@@ -227,7 +227,7 @@ void makeXauthFile(void)
 	*endPtr=0;
 	display=strndup(buffer,strlen(buffer));
 
-	asprintf(&command,"%s -f %s add \"%s\" . \"%s\" &>/dev/null",xauthBinPath,xauthFile,display,key);
+	asprintf(&command,"%s -f %s add \"%s\" . \"%s\" 2>/dev/null",xauthBinPath,xauthFile,display,key);
 	system(command);
 	if(!g_file_test(xauthFile,G_FILE_TEST_EXISTS))
 		exit(CANTMAKEXAUTHFILE);
