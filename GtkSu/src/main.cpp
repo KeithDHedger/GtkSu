@@ -24,6 +24,9 @@
 #define		MYEMAIL "kdhedger68713@gmail.com"
 #define		NOSHADOWUSER -1
 
+char*		user;
+char*		passwd;
+
 #ifndef _USEQT5_
 #include <gtk/gtk.h>
 GtkWidget*	window=NULL;
@@ -36,16 +39,9 @@ void shutdown(GtkWidget* widget,gpointer data)
 }
 #else
 #include <glib.h>
-//#include <QtGui>
-#include <QtWidgets>
 
-//#include <QApplication>
-//#include <QWidget>
-//#include <QMessageBox>
-//#include <QTextEdit>
-//#include <QPushButton>
-//#include <QObject>
-//#include <QVBoxLayout>
+#include <QtWidgets>
+#include <QObject>
 
 #endif
 
@@ -95,8 +91,16 @@ void doErrorMessage(const char* message,const char* data,const char* secondmessa
 	gtk_message_dialog_format_secondary_text((GtkMessageDialog*)dialog,"%s\n",secondmessage);
 	gtk_dialog_run((GtkDialog*)dialog);
 	gtk_widget_destroy(dialog);
+#else
+	QMessageBox		msgBox;
+fprintf(stderr,"XXXXXXXX\n");
+	msgBox.setText("Hello World!");
+	msgBox.setIcon(QMessageBox::Critical);
+	msgBox.exec();
+
 #endif
 }
+
 
 #ifndef _USEQT5_
 void doButton(GtkWidget* widget,gpointer data)
@@ -174,32 +178,78 @@ void getPath(void)
 	whereFrom=g_path_get_dirname(exepath);
 }
 
-int main(int argc,char **argv)
+#ifdef _USEQT5_
+QLineEdit*		nameBox;
+QLineEdit*		passBox;
+#endif
+
+void doGoForIt(void)
+{
+	printf("name=%s\n pass=%s\n",user,passwd);
+
+	FILE*		fp;
+	char		buffer[256];
+	int			retval;
+	char*		command;
+	char*		resulthash=NULL;
+	int			uid;
+	int			itworked;
+
+			sprintf(buffer,"id -u %s 2>/dev/null",user);
+			fp=popen(buffer, "r");
+			fgets(buffer,64,fp);
+			buffer[strlen(buffer)-1]=0;
+			retval=pclose(fp);
+			if(retval==0)
+				{
+					uid=atoi(buffer);
+					errno=0;
+					buffer[0]=0;
+					asprintf(&command,"%s/gtksuwrap gethash %s",whereFrom,user);
+					fp=popen(command,"r");
+					g_free(command);
+					if(fp!=NULL)
+						{
+							fgets(buffer,255,fp);
+							buffer[strlen(buffer)-1]=0;
+							pclose(fp);
+							asprintf(&hashedPass,"%s",buffer);
+							resulthash=crypt(passwd,hashedPass);
+
+							if((resulthash!=NULL) && (strcmp(hashedPass,resulthash)==0))
+								{
+									itworked=runAsUser(uid,user,resulthash);
+									//if(itworked==0)
+									//	shutdown(NULL,NULL);
+									//else
+									//	gtk_widget_show_all(window);
+								}
+							else
+								{
+									doErrorMessage("Could not run ",gargv[1],"Username and/or Password incorrect");
+								}
+						}
+					return;
+				}
+			else
+				doErrorMessage("Unknown User ",user,"");
+
+}
+
+void doApply(void)
 {
 #ifdef _USEQT5_
-QApplication app(argc, argv);
-
-          QTextEdit *textEdit = new QTextEdit;
-         QPushButton *quitButton = new QPushButton("&Quit");
-
-         QObject::connect(quitButton, SIGNAL(clicked()), qApp, SLOT(quit()));
-
-          QVBoxLayout *layout = new QVBoxLayout;
-          layout->addWidget(textEdit);
-         layout->addWidget(quitButton);
-
-         QWidget window;
-          window.setLayout(layout);
-
-          window.show();
-
-          return app.exec();
+	user=strdup(nameBox->text().toUtf8().constData());
+	passwd=strdup(passBox->text().toUtf8().constData());
 #else
-	GtkWidget*	vbox;
-	GtkWidget*	hbox;
-	GtkWidget*	buttonok;
-	GtkWidget*	button;
+	user=strdup(gtk_entry_get_text((GtkEntry*)nameEntry));
+	passwd=strdup(gtk_entry_get_text((GtkEntry*)passEntry));
 #endif
+	doGoForIt();
+}
+
+int main(int argc,char **argv)
+{
 	int c;
 	int option_index=0;
 
@@ -244,7 +294,45 @@ QApplication app(argc, argv);
 	for(int j=optind;j<argc;j++)
 		g_string_append_printf(commandStr," \"%s\"",argv[j]);
 
-#ifndef _USEQT5_
+#ifdef _USEQT5_
+	QApplication	app(argc, argv);
+	QWidget			mainWindow;
+	QVBoxLayout*	vlayout=new QVBoxLayout;
+	QHBoxLayout*	hlayout=new QHBoxLayout;
+	QPushButton*	cancelButton=new QPushButton("&Cancel");
+	QPushButton*	okButton=new QPushButton("&Apply");
+	QWidget*		hbox=new QWidget;
+
+	nameBox=new QLineEdit;
+	passBox=new QLineEdit;
+	nameBox->setText("root");
+	okButton->setDefault(true);
+
+	vlayout->addWidget(new QLabel("Name"));
+	vlayout->addWidget(nameBox);
+	vlayout->addWidget(new QLabel("Password"));
+	vlayout->addWidget(passBox);
+	passBox->setEchoMode(QLineEdit::Password);
+
+	hbox->setLayout(hlayout);
+	hlayout->addWidget(cancelButton);
+	hlayout->addWidget(okButton);
+
+	vlayout->addWidget(hbox);
+
+	QObject::connect(cancelButton,SIGNAL(clicked()),qApp,SLOT(quit()));
+	QObject::connect(okButton,&QPushButton::clicked,doApply );
+
+	mainWindow.setLayout(vlayout);
+	mainWindow.show();
+
+	return app.exec();
+#else
+	GtkWidget*	vbox;
+	GtkWidget*	hbox;
+	GtkWidget*	buttonok;
+	GtkWidget*	button;
+
 	gtk_init(&argc,&argv);
 
 	window=gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -281,7 +369,8 @@ QApplication app(argc, argv);
 	
 	buttonok=gtk_button_new_from_stock(GTK_STOCK_APPLY);
 	gtk_container_add(GTK_CONTAINER(hbox),buttonok);
-	g_signal_connect(G_OBJECT(buttonok),"clicked",G_CALLBACK(doButton),(void*)true);
+//	g_signal_connect(G_OBJECT(buttonok),"clicked",G_CALLBACK(doButton),(void*)true);
+	g_signal_connect(G_OBJECT(buttonok),"clicked",G_CALLBACK(doApply),NULL);
 
 	gtk_box_pack_start(GTK_BOX(hbox),gtk_label_new(""),true,true,0);
 

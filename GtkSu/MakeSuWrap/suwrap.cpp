@@ -27,9 +27,7 @@
 
 #include "config.h"
 
-#ifdef _USEQT5_
 #include <glib.h>
-#endif
 
 #include <pwd.h>
 #include <shadow.h>
