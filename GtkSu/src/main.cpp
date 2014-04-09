@@ -85,6 +85,9 @@ int runAsUser(int theuid,char*user,char* hashedpass)
 
 void doErrorMessage(const char* message,const char* data,const char* secondmessage)
 {
+	char*	vmessage;
+
+	asprintf(&vmessage,"%s %s\n%s",message,data,secondmessage);
 #ifndef _USEQT5_
 	GtkWidget*	dialog;
 	dialog=gtk_message_dialog_new((GtkWindow*)window,GTK_DIALOG_MODAL,GTK_MESSAGE_ERROR,GTK_BUTTONS_CLOSE,"%s %s\n",message,data);
@@ -93,12 +96,13 @@ void doErrorMessage(const char* message,const char* data,const char* secondmessa
 	gtk_widget_destroy(dialog);
 #else
 	QMessageBox		msgBox;
-fprintf(stderr,"XXXXXXXX\n");
-	msgBox.setText("Hello World!");
+
+	msgBox.setText(vmessage);
 	msgBox.setIcon(QMessageBox::Critical);
 	msgBox.exec();
 
 #endif
+	free(vmessage);
 }
 
 
