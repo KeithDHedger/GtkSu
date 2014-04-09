@@ -11,7 +11,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <gtk/gtk.h>
 #include <sys/stat.h>
 #include <errno.h>
  
@@ -23,12 +22,32 @@
 #include "config.h"
 
 #define		MYEMAIL "kdhedger68713@gmail.com"
-
 #define		NOSHADOWUSER -1
 
+#ifndef _USEQT5_
+#include <gtk/gtk.h>
 GtkWidget*	window=NULL;
 GtkWidget*	nameEntry=NULL;
 GtkWidget*	passEntry=NULL;
+
+void shutdown(GtkWidget* widget,gpointer data)
+{
+	gtk_main_quit();
+}
+#else
+#include <glib.h>
+//#include <QtGui>
+#include <QtWidgets>
+
+//#include <QApplication>
+//#include <QWidget>
+//#include <QMessageBox>
+//#include <QTextEdit>
+//#include <QPushButton>
+//#include <QObject>
+//#include <QVBoxLayout>
+
+#endif
 
 char**		gargv;
 GString*	commandStr=g_string_new(NULL);
@@ -51,21 +70,16 @@ struct option long_options[]=
 		{0, 0, 0, 0}
 	};
 
-void shutdown(GtkWidget* widget,gpointer data)
-{
-	gtk_main_quit();
-}
-
 int runAsUser(int theuid,char*user,char* hashedpass)
 {
 	GString*	str=g_string_new(NULL);
 
 	g_string_append_printf(str,"%s/gtksuwrap %i '%s' '%s' %s",whereFrom,theuid,user,hashedpass,commandStr->str);
-
+#ifndef _USEQT5_
 	gtk_widget_hide(window);
 	while(gtk_events_pending())
 		gtk_main_iteration_do(false);
-
+#endif
 	returnValFromApp=system(str->str);
 
 	g_string_free(str,true);
@@ -75,13 +89,16 @@ int runAsUser(int theuid,char*user,char* hashedpass)
 
 void doErrorMessage(const char* message,const char* data,const char* secondmessage)
 {
+#ifndef _USEQT5_
 	GtkWidget*	dialog;
 	dialog=gtk_message_dialog_new((GtkWindow*)window,GTK_DIALOG_MODAL,GTK_MESSAGE_ERROR,GTK_BUTTONS_CLOSE,"%s %s\n",message,data);
 	gtk_message_dialog_format_secondary_text((GtkMessageDialog*)dialog,"%s\n",secondmessage);
 	gtk_dialog_run((GtkDialog*)dialog);
 	gtk_widget_destroy(dialog);
+#endif
 }
 
+#ifndef _USEQT5_
 void doButton(GtkWidget* widget,gpointer data)
 {
 	FILE*		fp;
@@ -136,6 +153,7 @@ void doButton(GtkWidget* widget,gpointer data)
 				doErrorMessage("Unknown User ",gtk_entry_get_text((GtkEntry*)nameEntry),"");
 		}
 }
+#endif
 void printHelp(void)
 {
 	printf("GtkSu Version %s \nCopyright K.D.Hedger 2013, %s\n",VERSION,MYEMAIL);
@@ -158,11 +176,30 @@ void getPath(void)
 
 int main(int argc,char **argv)
 {
+#ifdef _USEQT5_
+QApplication app(argc, argv);
+
+          QTextEdit *textEdit = new QTextEdit;
+         QPushButton *quitButton = new QPushButton("&Quit");
+
+         QObject::connect(quitButton, SIGNAL(clicked()), qApp, SLOT(quit()));
+
+          QVBoxLayout *layout = new QVBoxLayout;
+          layout->addWidget(textEdit);
+         layout->addWidget(quitButton);
+
+         QWidget window;
+          window.setLayout(layout);
+
+          window.show();
+
+          return app.exec();
+#else
 	GtkWidget*	vbox;
 	GtkWidget*	hbox;
 	GtkWidget*	buttonok;
 	GtkWidget*	button;
-
+#endif
 	int c;
 	int option_index=0;
 
@@ -207,6 +244,7 @@ int main(int argc,char **argv)
 	for(int j=optind;j<argc;j++)
 		g_string_append_printf(commandStr," \"%s\"",argv[j]);
 
+#ifndef _USEQT5_
 	gtk_init(&argc,&argv);
 
 	window=gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -261,6 +299,7 @@ int main(int argc,char **argv)
 
 	gtk_widget_grab_focus(passEntry);
 	gtk_main();
+#endif
 
 	return(WEXITSTATUS(returnValFromApp));
 }

@@ -2,14 +2,16 @@
 AM_CPPFLAGS =	-I$(top_srcdir) \
 			$(GTK_CFLAGS) \
 			$(GLIB_CFLAGS) \
+			$(QT_CFLAGS) \
+			$(QTWIDGETS_CFLAGS) \
 			-DPREFIX=\""${prefix}\"" \
 			-DDATADIR=\""${pkgdatadir}"\" \
 			-DSYSCONFDIR=\""${sysconfdir}/${PACKAGE}"\" \
-			-DLIBDIR=\""${libdir}/${PACKAGE}"\"
+			-DLIBDIR=\""${libdir}/${PACKAGE}"\" \
+			-fPIC
 
-
-LIBS =	$(GTK_LIBS) \
+LIBS =	$(QT_LIBS) \
+		$(QTWIDGETS_LIBS) \
+		$(GTK_LIBS) \
 		$(GLIB_LIBS) \
 		-lcrypt
-
-#			-DSUWRAPPATH=\""${prefix}/bin/gtksuwrap"\"

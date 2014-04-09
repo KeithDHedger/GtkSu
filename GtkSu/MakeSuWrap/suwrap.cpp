@@ -24,13 +24,17 @@
 #include <sys/types.h>
 #include <grp.h>
 #include <sys/wait.h> 
- 
+
+#include "config.h"
+
+#ifdef _USEQT5_
+#include <glib.h>
+#endif
+
 #include <pwd.h>
 #include <shadow.h>
 #include <crypt.h>
-#include <gtk/gtk.h>
 
-#define	VERSION 0.1.0
 #define	NOSHADOWUSER 255
 #define CANTDROPPRIVS 254
 #define NOXAUTHBIN 253
