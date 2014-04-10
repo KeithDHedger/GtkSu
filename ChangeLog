@@ -1,3 +1,9 @@
+0.1.1
+Swapped butons in gtk.
+Fifixed not displaying deafult message.
+Fixed not diplaying alternate message.
+Added option to build with QT5 instead of Gtk ( default ).
+
 0.1.0
 Updated manpage.
 Load more error checking.
