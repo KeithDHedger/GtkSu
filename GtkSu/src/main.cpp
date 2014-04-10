@@ -55,10 +55,9 @@ GString*	runOptions=g_string_new(NULL);
 
 int			returnValFromApp=-1;
 
-void shutItDown(void)
+void shutItDown(gpointer x,gpointer y)
 {
 #ifdef _USEQT5_
-//	return(WEXITSTATUS(returnValFromApp));
 	return(holdapp->exit(WEXITSTATUS(returnValFromApp)));
 #else
 	gtk_main_quit();
@@ -115,63 +114,6 @@ void doErrorMessage(const char* message,const char* data,const char* secondmessa
 	free(vmessage);
 }
 
-
-#ifndef _USEQT5_
-void doButton(GtkWidget* widget,gpointer data)
-{
-	FILE*		fp;
-	char		buffer[256];
-	int			retval;
-	char*		command;
-	char*		resulthash=NULL;
-	int			uid;
-	int			itworked;
-
-	if((bool)data==false)
-		shutdown(NULL,NULL);
-	else
-		{
-			sprintf(buffer,"id -u %s 2>/dev/null",gtk_entry_get_text((GtkEntry*)nameEntry));
-			fp=popen(buffer, "r");
-			fgets(buffer,64,fp);
-			buffer[strlen(buffer)-1]=0;
-			retval=pclose(fp);
-			if(retval==0)
-				{
-					uid=atoi(buffer);
-					errno=0;
-					buffer[0]=0;
-					asprintf(&command,"%s/gtksuwrap gethash %s",whereFrom,(char*)gtk_entry_get_text((GtkEntry*)nameEntry));
-					fp=popen(command,"r");
-					g_free(command);
-					if(fp!=NULL)
-						{
-							fgets(buffer,255,fp);
-							buffer[strlen(buffer)-1]=0;
-							pclose(fp);
-							asprintf(&hashedPass,"%s",buffer);
-							resulthash=crypt((char*)gtk_entry_get_text((GtkEntry*)passEntry),hashedPass);
-
-							if((resulthash!=NULL) && (strcmp(hashedPass,resulthash)==0))
-								{
-									itworked=runAsUser(uid,(char*)gtk_entry_get_text((GtkEntry*)nameEntry),resulthash);
-									if(itworked==0)
-										shutItDown();
-									else
-										gtk_widget_show_all(window);
-								}
-							else
-								{
-									doErrorMessage("Could not run ",gargv[1],"Username and/or Password incorrect");
-								}
-						}
-					return;
-				}
-			else
-				doErrorMessage("Unknown User ",gtk_entry_get_text((GtkEntry*)nameEntry),"");
-		}
-}
-#endif
 void printHelp(void)
 {
 	printf("GtkSu Version %s \nCopyright K.D.Hedger 2013, %s\n",VERSION,MYEMAIL);
@@ -200,8 +142,6 @@ QLineEdit*		passBox;
 
 void doGoForIt(void)
 {
-//	printf("name=%s\n pass=%s\n",user,passwd);
-
 	FILE*		fp;
 	char		buffer[256];
 	int			retval;
@@ -235,7 +175,7 @@ void doGoForIt(void)
 						{
 							itworked=runAsUser(uid,user,resulthash);
 									if(itworked==0)
-										shutItDown();
+										shutItDown(NULL,NULL);
 									//	shutItDown();
 									//else
 									//	gtk_widget_show_all(window);
@@ -312,27 +252,49 @@ int main(int argc,char **argv)
 
 #ifdef _USEQT5_
 	QApplication	app(argc, argv);
-//	app=new QApplication(argc, argv);
+
 	holdapp=&app;
 	QVBoxLayout*	vlayout=new QVBoxLayout;
-	QHBoxLayout*	hlayout=new QHBoxLayout;
+	QHBoxLayout*	hlayout;
 	QPushButton*	cancelButton=new QPushButton("&Cancel");
 	QPushButton*	okButton=new QPushButton("&Apply");
-	QWidget*		hbox=new QWidget;
+	QWidget*		hbox;
 
 	mainWindow=new QWidget;
 
 	nameBox=new QLineEdit;
 	passBox=new QLineEdit;
 	nameBox->setText("root");
+	if(userName!=NULL)
+		{
+			nameBox->setText(userName);
+			nameBox->hide();
+		}
+	else
+		nameBox->setText("root");
+
 	okButton->setDefault(true);
 
-	vlayout->addWidget(new QLabel("Name"));
-	vlayout->addWidget(nameBox);
-	vlayout->addWidget(new QLabel("Password"));
-	vlayout->addWidget(passBox);
-	passBox->setEchoMode(QLineEdit::Password);
+	hlayout=new QHBoxLayout;
+	hbox=new QWidget;
+	hbox->setLayout(hlayout);
+	if(userName==NULL)
+		{
+			hlayout->addWidget(new QLabel("User Name"),Qt::AlignLeft);
+			hlayout->addWidget(nameBox,Qt::AlignRight);
+			vlayout->addWidget(hbox);
+		}
 
+	hlayout=new QHBoxLayout;
+	hbox=new QWidget;
+	hbox->setLayout(hlayout);
+	hlayout->addWidget(new QLabel("Password"),Qt::AlignLeft);
+	hlayout->addWidget(passBox,Qt::AlignRight);
+	passBox->setEchoMode(QLineEdit::Password);
+	vlayout->addWidget(hbox);
+
+	hbox=new QWidget;
+	hlayout=new QHBoxLayout;
 	hbox->setLayout(hlayout);
 	hlayout->addWidget(cancelButton);
 	hlayout->addWidget(okButton);
@@ -344,8 +306,7 @@ int main(int argc,char **argv)
 
 	mainWindow->setLayout(vlayout);
 	mainWindow->show();
-
-	return app.exec();
+	app.exec();
 #else
 	GtkWidget*	vbox;
 	GtkWidget*	hbox;
@@ -356,11 +317,18 @@ int main(int argc,char **argv)
 
 	window=gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title((GtkWindow*)window,"GtkSu");
-	g_signal_connect(G_OBJECT(window),"delete-event",G_CALLBACK(shutdown),NULL);
+	g_signal_connect(G_OBJECT(window),"delete-event",G_CALLBACK(shutItDown),NULL);
 
 	vbox=gtk_vbox_new(false,0);
 	nameEntry=gtk_entry_new();
-	g_signal_connect_after(G_OBJECT(nameEntry),"activate",G_CALLBACK(doButton),(void*)true);
+	g_signal_connect_after(G_OBJECT(nameEntry),"activate",G_CALLBACK(doApply),NULL);
+
+	if(bodyMessage!=NULL)
+		gtk_box_pack_start(GTK_BOX(vbox),gtk_label_new(bodyMessage),false,true,0);
+	else
+		gtk_box_pack_start(GTK_BOX(vbox),gtk_label_new("Please enter the desired username and password:"),false,true,0);
+
+	gtk_box_pack_start(GTK_BOX(vbox),gtk_hseparator_new(),false,false,2);
 
 	if(userName!=NULL)
 		{
@@ -369,17 +337,21 @@ int main(int argc,char **argv)
 		}
 	else
 		{
+			hbox=gtk_hbox_new(false,0);
 			gtk_entry_set_text((GtkEntry*)nameEntry,"root");
-			gtk_box_pack_start(GTK_BOX(vbox),gtk_label_new("User Name"),false,true,0);
+			gtk_box_pack_start(GTK_BOX(hbox),gtk_label_new("User Name\t"),false,true,0);
+			gtk_box_pack_start(GTK_BOX(hbox),nameEntry,true,true,0);
+			gtk_box_pack_start(GTK_BOX(vbox),hbox,true,true,0);
 		}
 
 	passEntry=gtk_entry_new();
 	gtk_entry_set_visibility((GtkEntry*)passEntry,false);
-	g_signal_connect_after(G_OBJECT(passEntry),"activate",G_CALLBACK(doButton),(void*)true);
+	g_signal_connect_after(G_OBJECT(passEntry),"activate",G_CALLBACK(doApply),NULL);
 
-	gtk_box_pack_start(GTK_BOX(vbox),nameEntry,false,true,0);
-	gtk_box_pack_start(GTK_BOX(vbox),gtk_label_new("Password"),false,true,0);
-	gtk_box_pack_start(GTK_BOX(vbox),passEntry,false,true,0);
+	hbox=gtk_hbox_new(false,0);
+	gtk_box_pack_start(GTK_BOX(hbox),gtk_label_new("Password\t"),false,true,0);
+	gtk_box_pack_start(GTK_BOX(hbox),passEntry,true,true,0);
+	gtk_box_pack_start(GTK_BOX(vbox),hbox,true,true,0);
 
 	gtk_box_pack_start(GTK_BOX(vbox),gtk_hseparator_new(),false,false,2);
 
@@ -388,14 +360,13 @@ int main(int argc,char **argv)
 	
 	buttonok=gtk_button_new_from_stock(GTK_STOCK_APPLY);
 	gtk_container_add(GTK_CONTAINER(hbox),buttonok);
-//	g_signal_connect(G_OBJECT(buttonok),"clicked",G_CALLBACK(doButton),(void*)true);
 	g_signal_connect(G_OBJECT(buttonok),"clicked",G_CALLBACK(doApply),NULL);
 
 	gtk_box_pack_start(GTK_BOX(hbox),gtk_label_new(""),true,true,0);
 
 	button=gtk_button_new_from_stock(GTK_STOCK_CANCEL);
 	gtk_container_add(GTK_CONTAINER(hbox),button);
-	g_signal_connect(G_OBJECT(button),"clicked",G_CALLBACK(doButton),(void*)false);
+	g_signal_connect(G_OBJECT(button),"clicked",G_CALLBACK(shutItDown),NULL);
 
 	gtk_box_pack_start(GTK_BOX(vbox),hbox,true,true,4);
 	gtk_container_add(GTK_CONTAINER(window),vbox);
