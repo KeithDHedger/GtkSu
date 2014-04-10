@@ -59,6 +59,21 @@ sudo make install
 
 You may need to adjust package names slightly depending on the version of debian/fedora that you have installed.
 
+You can also choose to build a QT5 version by adding --enable-qt5 to the configure command, the default is to build a gtk GUI.
+To install Qt5 go to here:
+http://qt-project.org/downloads
+
+Download the required file and then do this:
+http://qt-project.org/wiki/Install_Qt_5_on_Ubuntu
+
+If you have installed in /opt/... which is the default for the installer to compile with the --enable-qt5 flag add this line:
+/opt/Qt5.2.1/5.2.1/gcc_64/lib
+to /etc/ld.so.conf
+and do this:
+PKG_CONFIG_PATH=/opt/Qt5.2.1/5.2.1/gcc_64/lib/pkgconfig ./configure --prefix=/usr --enable-ktsuss-link --enable-qt5
+
+If you have installed Qt5 elsewhere just adjust the /etc/ld.so.conf and PKG_CONFIG_PATH to suit.
+
 If your distro disables the root account ( I'm looking at you Ubuntu! ) you may have to set a root password like so:
 Open a Terminal and type:
 sudo su
