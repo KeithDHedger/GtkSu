@@ -259,6 +259,7 @@ int main(int argc,char **argv)
 	QPushButton*	cancelButton=new QPushButton("&Cancel");
 	QPushButton*	okButton=new QPushButton("&Apply");
 	QWidget*		hbox;
+	QLabel*			label;
 
 	mainWindow=new QWidget;
 
@@ -273,7 +274,18 @@ int main(int argc,char **argv)
 	else
 		nameBox->setText("root");
 
-	okButton->setDefault(true);
+	if(bodyMessage!=NULL)
+			label=new QLabel(bodyMessage);
+	else
+		label=new QLabel("Please enter the desired username and password:");
+
+	hlayout=new QHBoxLayout;
+	hbox=new QWidget;
+	hbox->setLayout(hlayout);
+	label->setAlignment(Qt::AlignCenter);
+	hlayout->addWidget(label);
+	vlayout->addWidget(hbox);
+
 
 	hlayout=new QHBoxLayout;
 	hbox=new QWidget;
@@ -303,10 +315,14 @@ int main(int argc,char **argv)
 
 	QObject::connect(cancelButton,SIGNAL(clicked()),qApp,SLOT(quit()));
 	QObject::connect(okButton,&QPushButton::clicked,doApply );
+	QObject::connect(passBox,&QLineEdit::returnPressed,doApply );
 
 	mainWindow->setLayout(vlayout);
+	passBox->setFocus();
 	mainWindow->show();
+
 	app.exec();
+
 #else
 	GtkWidget*	vbox;
 	GtkWidget*	hbox;
