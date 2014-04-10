@@ -33,17 +33,15 @@ GtkWidget*	window=NULL;
 GtkWidget*	nameEntry=NULL;
 GtkWidget*	passEntry=NULL;
 
-void shutdown(GtkWidget* widget,gpointer data)
-{
-	gtk_main_quit();
-}
 #else
 #include <glib.h>
 
 #include <QtWidgets>
 #include <QObject>
-
+QApplication*	holdapp;
+QWidget*		mainWindow;
 #endif
+
 
 char**		gargv;
 GString*	commandStr=g_string_new(NULL);
@@ -56,6 +54,16 @@ char*		bodyMessage=NULL;
 GString*	runOptions=g_string_new(NULL);
 
 int			returnValFromApp=-1;
+
+void shutItDown(void)
+{
+#ifdef _USEQT5_
+//	return(WEXITSTATUS(returnValFromApp));
+	return(holdapp->exit(WEXITSTATUS(returnValFromApp)));
+#else
+	gtk_main_quit();
+#endif
+}
 
 struct option long_options[]=
 	{
@@ -75,6 +83,8 @@ int runAsUser(int theuid,char*user,char* hashedpass)
 	gtk_widget_hide(window);
 	while(gtk_events_pending())
 		gtk_main_iteration_do(false);
+#else
+	mainWindow->hide();
 #endif
 	returnValFromApp=system(str->str);
 
@@ -146,7 +156,7 @@ void doButton(GtkWidget* widget,gpointer data)
 								{
 									itworked=runAsUser(uid,(char*)gtk_entry_get_text((GtkEntry*)nameEntry),resulthash);
 									if(itworked==0)
-										shutdown(NULL,NULL);
+										shutItDown();
 									else
 										gtk_widget_show_all(window);
 								}
@@ -185,11 +195,12 @@ void getPath(void)
 #ifdef _USEQT5_
 QLineEdit*		nameBox;
 QLineEdit*		passBox;
+
 #endif
 
 void doGoForIt(void)
 {
-	printf("name=%s\n pass=%s\n",user,passwd);
+//	printf("name=%s\n pass=%s\n",user,passwd);
 
 	FILE*		fp;
 	char		buffer[256];
@@ -199,44 +210,45 @@ void doGoForIt(void)
 	int			uid;
 	int			itworked;
 
-			sprintf(buffer,"id -u %s 2>/dev/null",user);
-			fp=popen(buffer, "r");
-			fgets(buffer,64,fp);
-			buffer[strlen(buffer)-1]=0;
-			retval=pclose(fp);
-			if(retval==0)
+	sprintf(buffer,"id -u %s 2>/dev/null",user);
+	fp=popen(buffer, "r");
+	fgets(buffer,64,fp);
+	buffer[strlen(buffer)-1]=0;
+	retval=pclose(fp);
+	if(retval==0)
+		{
+			uid=atoi(buffer);
+			errno=0;
+			buffer[0]=0;
+			asprintf(&command,"%s/gtksuwrap gethash %s",whereFrom,user);
+			fp=popen(command,"r");
+			g_free(command);
+			if(fp!=NULL)
 				{
-					uid=atoi(buffer);
-					errno=0;
-					buffer[0]=0;
-					asprintf(&command,"%s/gtksuwrap gethash %s",whereFrom,user);
-					fp=popen(command,"r");
-					g_free(command);
-					if(fp!=NULL)
-						{
-							fgets(buffer,255,fp);
-							buffer[strlen(buffer)-1]=0;
-							pclose(fp);
-							asprintf(&hashedPass,"%s",buffer);
-							resulthash=crypt(passwd,hashedPass);
+					fgets(buffer,255,fp);
+					buffer[strlen(buffer)-1]=0;
+					pclose(fp);
+					asprintf(&hashedPass,"%s",buffer);
+					resulthash=crypt(passwd,hashedPass);
 
-							if((resulthash!=NULL) && (strcmp(hashedPass,resulthash)==0))
-								{
-									itworked=runAsUser(uid,user,resulthash);
-									//if(itworked==0)
-									//	shutdown(NULL,NULL);
+					if((resulthash!=NULL) && (strcmp(hashedPass,resulthash)==0))
+						{
+							itworked=runAsUser(uid,user,resulthash);
+									if(itworked==0)
+										shutItDown();
+									//	shutItDown();
 									//else
 									//	gtk_widget_show_all(window);
-								}
-							else
-								{
-									doErrorMessage("Could not run ",gargv[1],"Username and/or Password incorrect");
-								}
 						}
-					return;
+					else
+						{
+							doErrorMessage("Could not run ",gargv[1],"Username and/or Password incorrect");
+						}
 				}
-			else
-				doErrorMessage("Unknown User ",user,"");
+			return;
+		}
+	else
+		doErrorMessage("Unknown User ",user,"");
 
 }
 
@@ -300,12 +312,15 @@ int main(int argc,char **argv)
 
 #ifdef _USEQT5_
 	QApplication	app(argc, argv);
-	QWidget			mainWindow;
+//	app=new QApplication(argc, argv);
+	holdapp=&app;
 	QVBoxLayout*	vlayout=new QVBoxLayout;
 	QHBoxLayout*	hlayout=new QHBoxLayout;
 	QPushButton*	cancelButton=new QPushButton("&Cancel");
 	QPushButton*	okButton=new QPushButton("&Apply");
 	QWidget*		hbox=new QWidget;
+
+	mainWindow=new QWidget;
 
 	nameBox=new QLineEdit;
 	passBox=new QLineEdit;
@@ -327,8 +342,8 @@ int main(int argc,char **argv)
 	QObject::connect(cancelButton,SIGNAL(clicked()),qApp,SLOT(quit()));
 	QObject::connect(okButton,&QPushButton::clicked,doApply );
 
-	mainWindow.setLayout(vlayout);
-	mainWindow.show();
+	mainWindow->setLayout(vlayout);
+	mainWindow->show();
 
 	return app.exec();
 #else
