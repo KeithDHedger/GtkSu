@@ -1,6 +1,6 @@
 #
 #
-AC_INIT([GtkSu],[0.1.1],[PROJ],[GtkSu])
+AC_INIT([GtkSu],[0.1.2],[PROJ],[GtkSu])
 
 AC_CONFIG_HEADER([config.h])
 AC_PROG_CXX
@@ -24,10 +24,6 @@ PKG_PROG_PKG_CONFIG
 
 AC_ARG_ENABLE(qt5,[  --enable-qt5		Enable QT5.],[enable_qt5=$enableval],[enable_qt5="no"])
 if test $enable_qt5 = "yes" ;then
-#	QT_MODULES="Qt5Gui >= 5.2.1"
-#	PKG_CHECK_MODULES(QT, $QT_MODULES)
-#	AC_SUBST(QT_CFLAGS)
-#	AC_SUBST(QT_LIBS)
 
 	QTWIDGETS_MODULES="Qt5Widgets >= 5.2.1"
 	PKG_CHECK_MODULES(QTWIDGETS, $QTWIDGETS_MODULES)

@@ -1,6 +1,10 @@
+0.1.2
+Removed unnecessary .desktop and png file.
+Minor update to man page.
+
 0.1.1
 Swapped butons in gtk.
-Fifixed not displaying default message.
+Fixed not displaying default message.
 Fixed not displaying alternate message.
 Added option to build with QT5 instead of Gtk ( default ).
 
