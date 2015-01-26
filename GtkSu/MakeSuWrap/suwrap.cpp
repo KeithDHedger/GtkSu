@@ -302,10 +302,11 @@ int main(int argc,char **argv)
 		{		
 			for(j=4;j<argc;j++)
 				g_string_append_printf(str," \"%s\"",argv[j]);
-
+			keepEnvs(geteuid());
+			makeXauthFile();
 			restore_privileges();
 				setresuid(theuid,theuid,theuid);
-				cleanEnv(geteuid(),true);
+				cleanEnv(geteuid(),false);
 				retFromApp=system(str->str);
 				unlink(xauthFile);
 				rmdir(xauthDir);
