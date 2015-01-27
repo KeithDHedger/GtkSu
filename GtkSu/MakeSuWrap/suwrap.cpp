@@ -201,45 +201,22 @@ void makeXauthFile(void)
 			exit(NOXAUTHBIN);
 		}
 
-	xauthDir=mkdtemp(tname);
+	xauthDir=strdup(mkdtemp(tname));
 	if(xauthDir==NULL)
 		exit(CANTMAKETMPDIR);
 
 	asprintf(&xauthFile,"%s/.Xauthority",xauthDir);
-
-	asprintf(&command,"%s list %s|head -1",xauthBinPath,userDisplay);
-	fp=popen(command, "r");
-	if(fp!=NULL)
-		{
-			fgets(buffer,1024,fp);
-			pclose(fp);
-		}
-	else
-		exit(CANTMAKEXAUTHFILE);
-
-	endPtr=strrchr(buffer,' ');
-	if(endPtr==NULL)
-		exit(CANTMAKEXAUTHFILE);
-	endPtr--;
-	key=strndup(endPtr,strlen(endPtr)-1);
-
-	endPtr=strchr(buffer,' ');
-	if(endPtr==NULL)
-		exit(CANTMAKEXAUTHFILE);
-	*endPtr=0;
-	display=strndup(buffer,strlen(buffer));
-
-	asprintf(&command,"%s -f %s add \"%s\" . \"%s\" 2>/dev/null",xauthBinPath,xauthFile,display,key);
+	asprintf(&command,"chmod 777 %s",xauthDir);
 	system(command);
-	if(!g_file_test(xauthFile,G_FILE_TEST_EXISTS))
-		exit(CANTMAKEXAUTHFILE);
+	free(command);
+	asprintf(&command,"%s extract - %s > %s",xauthBinPath,userDisplay,xauthFile);
+	system(command);
+	free(command);
 }
 
 void cleanEnv(int theuid,bool createxauth)
 {
 	keepEnvs(theuid);
-	if(createxauth==true)
-		makeXauthFile();
 
 #ifdef _GOTCLEARENV_
 	if(clearenv()!=0)
@@ -261,9 +238,6 @@ void cleanEnv(int theuid,bool createxauth)
 	setenv("USERNAME",userName,1);
 	setenv("SHELL",userShell,1);
 	setenv("DISPLAY",userDisplay,1);
-	if(createxauth==true)
-		setenv("XAUTHORITY",xauthFile,1);
-
 	setenv("TZ",userTz,1);
 	setenv("LANG",userLang,1);
 	setenv("LC_ALL",userLcAll,1);
@@ -285,6 +259,8 @@ int main(int argc,char **argv)
 	GString*	str;
 	int			theuid;
 	int			retval;
+	char		*command;
+	char		*hold;
 
 	drop_privileges(0);
 	cleanEnv(geteuid(),false);
@@ -301,17 +277,19 @@ int main(int argc,char **argv)
 	if(checkPasswd(argv[2],argv[3])==0)
 		{		
 			for(j=4;j<argc;j++)
-				g_string_append_printf(str," \"%s\"",argv[j]);
-			keepEnvs(geteuid());
+				g_string_append_printf(str," %s",argv[j]);
 			makeXauthFile();
 			restore_privileges();
 				setresuid(theuid,theuid,theuid);
 				cleanEnv(geteuid(),false);
+				setenv("XAUTHORITY",xauthFile,1);
 				retFromApp=system(str->str);
-				unlink(xauthFile);
-				rmdir(xauthDir);
 			drop_privileges(0);
+			unlink(xauthFile);
+			rmdir(xauthDir);
 			g_string_free(str,true);
+			free(xauthDir);
+			free(xauthFile);
 
 			return(WEXITSTATUS(retFromApp));
 		}
