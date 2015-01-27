@@ -1,5 +1,13 @@
+0.1.4
+Command line to gtksu can now be quoted or not eg to open the file "/tmp/dat 1" all these are the same:
+gtksu -- leafpad /tmp/dat\ 1
+gtksu -- "leafpad /tmp/dat\ 1"
+gtksu -- 'leafpad /tmp/dat\ 1'
+gtksu -- leafpad "/tmp/dat 1"
+gtksu -- 'leafpad \"/tmp/dat 1\"'
+
 0.1.3
-Added submitted patch to fix minor bug when using --user switch.
+Added submitted patch to fix minor bug when using --user switch, thanks to Ludger Krämer for that.
 
 0.1.2
 Removed unnecessary .desktop and png file.

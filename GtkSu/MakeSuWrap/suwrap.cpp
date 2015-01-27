@@ -182,11 +182,6 @@ void keepEnvs(int theuid)
 void makeXauthFile(void)
 {
 	char*		command;
-	FILE*		fp;
-	char		buffer[1024]={0,};
-	char*		display;
-	char*		key;
-	char*		endPtr;
 	gchar		tname[]="/tmp/GtkSu-XXXXXX";
 	const char*	xauthBinPath=NULL;
 
@@ -259,8 +254,6 @@ int main(int argc,char **argv)
 	GString*	str;
 	int			theuid;
 	int			retval;
-	char		*command;
-	char		*hold;
 
 	drop_privileges(0);
 	cleanEnv(geteuid(),false);
@@ -275,14 +268,20 @@ int main(int argc,char **argv)
 		}
 
 	if(checkPasswd(argv[2],argv[3])==0)
-		{		
+		{
 			for(j=4;j<argc;j++)
-				g_string_append_printf(str," %s",argv[j]);
+				{
+					if(j==4)
+						g_string_append_printf(str," %s",argv[j]);
+					else
+						g_string_append_printf(str," \"%s\"",argv[j]);
+				}
 			makeXauthFile();
 			restore_privileges();
 				setresuid(theuid,theuid,theuid);
 				cleanEnv(geteuid(),false);
 				setenv("XAUTHORITY",xauthFile,1);
+				printf(">%s<\n",str->str);
 				retFromApp=system(str->str);
 			drop_privileges(0);
 			unlink(xauthFile);
