@@ -70,7 +70,7 @@ char*			xauthFile=NULL;
 void setEnvTest(const char *env,const char *envvar)
 {
 	if(envvar!=NULL)
-		setenv("DISPLAY",envvar,1);
+		setenv(env,envvar,1);
 }
 
 void drop_privileges(int permanent)
