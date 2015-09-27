@@ -67,6 +67,12 @@ extern char**	environ;
 char*			xauthDir=NULL;
 char*			xauthFile=NULL;
 
+void setEnvTest(const char *env,const char *envvar)
+{
+	if(envvar!=NULL)
+		setenv("DISPLAY",envvar,1);
+}
+
 void drop_privileges(int permanent)
 {
 	if (geteuid()!=0)
@@ -232,12 +238,14 @@ void cleanEnv(int theuid,bool createxauth)
 	setenv("HOME",userHome,1);
 	setenv("USERNAME",userName,1);
 	setenv("SHELL",userShell,1);
-	setenv("DISPLAY",userDisplay,1);
-	setenv("TZ",userTz,1);
-	setenv("LANG",userLang,1);
-	setenv("LC_ALL",userLcAll,1);
-	setenv("LC_COLLATE",userLCCol,1);
-	setenv("LC_CTYPE",userLCCType,1);
+
+
+	setEnvTest("DISPLAY",userDisplay);
+	setEnvTest("TZ",userTz);
+	setEnvTest("LANG",userLang);
+	setEnvTest("LC_ALL",userLcAll);
+	setEnvTest("LC_COLLATE",userLCCol);
+	setEnvTest("LC_CTYPE",userLCCType);
 	if(chdir(userHome)!=0)
 		{
 			if(chdir("/")!=0)
@@ -280,8 +288,7 @@ int main(int argc,char **argv)
 			restore_privileges();
 				setresuid(theuid,theuid,theuid);
 				cleanEnv(geteuid(),false);
-				setenv("XAUTHORITY",xauthFile,1);
-				printf(">%s<\n",str->str);
+				setEnvTest("XAUTHORITY",xauthFile);
 				retFromApp=system(str->str);
 			drop_privileges(0);
 			unlink(xauthFile);

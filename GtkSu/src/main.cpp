@@ -176,9 +176,6 @@ void doGoForIt(void)
 							itworked=runAsUser(uid,user,resulthash);
 									if(itworked==0)
 										shutItDown(NULL,NULL);
-									//	shutItDown();
-									//else
-									//	gtk_widget_show_all(window);
 						}
 					else
 						{
