@@ -1,3 +1,6 @@
+0.1.5
+Fixed some distros not setting some users environment variables.
+
 0.1.4
 Command line to gtksu can now be quoted or not eg to open the file "/tmp/dat 1" all these are the same:
 gtksu -- leafpad /tmp/dat\ 1
