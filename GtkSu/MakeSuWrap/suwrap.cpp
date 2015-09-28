@@ -1,6 +1,21 @@
 /*
  *
- * K.D.Hedger 2012-2014 <kdhedger68713@gmail.com>
+ * ©K. D. Hedger. Sun 27 Sep 20:11:17 BST 2015 kdhedger68713@gmail.com
+
+ * This file (suwrap.cpp) is part of GtkSu.
+
+ * GtkSu is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * at your option) any later version.
+
+ * GtkSu is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with GtkSu.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Parts of this code are from udevil.c available here:
  * https://nodeload.github.com/IgnorantGuru/udevil/zip/master
