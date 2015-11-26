@@ -1,6 +1,6 @@
 #
 #
-AC_INIT([GtkSu],[0.1.5],[PROJ],[GtkSu])
+AC_INIT([GtkSu],[0.1.6],[PROJ],[GtkSu])
 
 AC_CONFIG_HEADER([config.h])
 AC_PROG_CXX
@@ -10,16 +10,6 @@ AM_INIT_AUTOMAKE
 AC_PROG_CC
 AC_HEADER_STDC
 
-AC_SUBST(CFLAGS)
-AC_SUBST(CPPFLAGS)
-AC_SUBST(LDFLAGS)
-AM_PROG_CC_C_O
-
-CXXFLAGS=-Wall
-AC_SUBST(CXXFLAGS)
-
-CFLAGS=-Wall
-AC_SUBST(CFLAGS)
 PKG_PROG_PKG_CONFIG
 
 AC_ARG_ENABLE(qt5,[  --enable-qt5		Enable QT5.],[enable_qt5=$enableval],[enable_qt5="no"])

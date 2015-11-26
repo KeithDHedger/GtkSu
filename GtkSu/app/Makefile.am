@@ -6,9 +6,6 @@ include ../sources
 
 gtksu_SOURCES = $(COMMONSRC)
 
-gtksu_CFLAGS = -O3 -export-dynamic
-gtksu_CXXFLAGS = -O3 -export-dynamic
-
 bin_PROGRAMS = gtksu
 
 man1_MANS = ../resources/man/gtksu.1.gz

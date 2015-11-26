@@ -1,3 +1,9 @@
+0.1.6
+Removed redundant scripts folder.
+Updated manpage.
+Removed forced CFLAGS and CXXFLAGS.
+Added to Github:https://github.com/KeithDHedger/GtkSu
+
 0.1.5
 Updated licence info in files.
 Fixed some distros not setting some users environment variables.

@@ -100,12 +100,10 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
-am__objects_1 = ../src/gtksu-main.$(OBJEXT)
+am__objects_1 = ../src/main.$(OBJEXT)
 am_gtksu_OBJECTS = $(am__objects_1)
 gtksu_OBJECTS = $(am_gtksu_OBJECTS)
 gtksu_LDADD = $(LDADD)
-gtksu_LINK = $(CXXLD) $(gtksu_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
-	$(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -122,10 +120,6 @@ DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 AM_V_CXX = $(am__v_CXX_@AM_V@)
@@ -317,8 +311,6 @@ AM_CPPFLAGS = -I$(top_srcdir) \
 
 COMMONSRC = ../src/main.cpp
 gtksu_SOURCES = $(COMMONSRC)
-gtksu_CFLAGS = -O3 -export-dynamic
-gtksu_CXXFLAGS = -O3 -export-dynamic
 man1_MANS = ../resources/man/gtksu.1.gz
 @KTSUSSLINK_TRUE@ktsuss = "makelink"
 all: all-am
@@ -403,12 +395,12 @@ clean-binPROGRAMS:
 ../src/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) ../src/$(DEPDIR)
 	@: > ../src/$(DEPDIR)/$(am__dirstamp)
-../src/gtksu-main.$(OBJEXT): ../src/$(am__dirstamp) \
+../src/main.$(OBJEXT): ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
 
 gtksu$(EXEEXT): $(gtksu_OBJECTS) $(gtksu_DEPENDENCIES) $(EXTRA_gtksu_DEPENDENCIES) 
 	@rm -f gtksu$(EXEEXT)
-	$(AM_V_CXXLD)$(gtksu_LINK) $(gtksu_OBJECTS) $(gtksu_LDADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK) $(gtksu_OBJECTS) $(gtksu_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -417,7 +409,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/gtksu-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/main.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -434,20 +426,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-../src/gtksu-main.o: ../src/main.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gtksu_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtksu-main.o -MD -MP -MF ../src/$(DEPDIR)/gtksu-main.Tpo -c -o ../src/gtksu-main.o `test -f '../src/main.cpp' || echo '$(srcdir)/'`../src/main.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/gtksu-main.Tpo ../src/$(DEPDIR)/gtksu-main.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/main.cpp' object='../src/gtksu-main.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gtksu_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtksu-main.o `test -f '../src/main.cpp' || echo '$(srcdir)/'`../src/main.cpp
-
-../src/gtksu-main.obj: ../src/main.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gtksu_CXXFLAGS) $(CXXFLAGS) -MT ../src/gtksu-main.obj -MD -MP -MF ../src/$(DEPDIR)/gtksu-main.Tpo -c -o ../src/gtksu-main.obj `if test -f '../src/main.cpp'; then $(CYGPATH_W) '../src/main.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/main.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) ../src/$(DEPDIR)/gtksu-main.Tpo ../src/$(DEPDIR)/gtksu-main.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='../src/main.cpp' object='../src/gtksu-main.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gtksu_CXXFLAGS) $(CXXFLAGS) -c -o ../src/gtksu-main.obj `if test -f '../src/main.cpp'; then $(CYGPATH_W) '../src/main.cpp'; else $(CYGPATH_W) '$(srcdir)/../src/main.cpp'; fi`
 install-man1: $(man1_MANS)
 	@$(NORMAL_INSTALL)
 	@list1='$(man1_MANS)'; \

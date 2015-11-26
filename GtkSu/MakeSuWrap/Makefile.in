@@ -99,11 +99,9 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_gtksuwrap_OBJECTS = gtksuwrap-suwrap.$(OBJEXT)
+am_gtksuwrap_OBJECTS = suwrap.$(OBJEXT)
 gtksuwrap_OBJECTS = $(am_gtksuwrap_OBJECTS)
 gtksuwrap_LDADD = $(LDADD)
-gtksuwrap_LINK = $(CXXLD) $(gtksuwrap_CXXFLAGS) $(CXXFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -120,10 +118,6 @@ DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
 AM_V_CXX = $(am__v_CXX_@AM_V@)
@@ -283,8 +277,6 @@ AM_CPPFLAGS = -I$(top_srcdir) \
 			-fPIC
 
 gtksuwrap_SOURCES = suwrap.cpp
-gtksuwrap_CFLAGS = -O3 -export-dynamic
-gtksuwrap_CXXFLAGS = -O3 -export-dynamic
 all: all-am
 
 .SUFFIXES:
@@ -364,7 +356,7 @@ clean-binPROGRAMS:
 
 gtksuwrap$(EXEEXT): $(gtksuwrap_OBJECTS) $(gtksuwrap_DEPENDENCIES) $(EXTRA_gtksuwrap_DEPENDENCIES) 
 	@rm -f gtksuwrap$(EXEEXT)
-	$(AM_V_CXXLD)$(gtksuwrap_LINK) $(gtksuwrap_OBJECTS) $(gtksuwrap_LDADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK) $(gtksuwrap_OBJECTS) $(gtksuwrap_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -372,7 +364,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gtksuwrap-suwrap.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/suwrap.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -387,20 +379,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-gtksuwrap-suwrap.o: suwrap.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gtksuwrap_CXXFLAGS) $(CXXFLAGS) -MT gtksuwrap-suwrap.o -MD -MP -MF $(DEPDIR)/gtksuwrap-suwrap.Tpo -c -o gtksuwrap-suwrap.o `test -f 'suwrap.cpp' || echo '$(srcdir)/'`suwrap.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gtksuwrap-suwrap.Tpo $(DEPDIR)/gtksuwrap-suwrap.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='suwrap.cpp' object='gtksuwrap-suwrap.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gtksuwrap_CXXFLAGS) $(CXXFLAGS) -c -o gtksuwrap-suwrap.o `test -f 'suwrap.cpp' || echo '$(srcdir)/'`suwrap.cpp
-
-gtksuwrap-suwrap.obj: suwrap.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gtksuwrap_CXXFLAGS) $(CXXFLAGS) -MT gtksuwrap-suwrap.obj -MD -MP -MF $(DEPDIR)/gtksuwrap-suwrap.Tpo -c -o gtksuwrap-suwrap.obj `if test -f 'suwrap.cpp'; then $(CYGPATH_W) 'suwrap.cpp'; else $(CYGPATH_W) '$(srcdir)/suwrap.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gtksuwrap-suwrap.Tpo $(DEPDIR)/gtksuwrap-suwrap.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='suwrap.cpp' object='gtksuwrap-suwrap.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(gtksuwrap_CXXFLAGS) $(CXXFLAGS) -c -o gtksuwrap-suwrap.obj `if test -f 'suwrap.cpp'; then $(CYGPATH_W) 'suwrap.cpp'; else $(CYGPATH_W) '$(srcdir)/suwrap.cpp'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -609,10 +587,6 @@ uninstall-am: uninstall-binPROGRAMS
 
 .PRECIOUS: Makefile
 
-
-#all-local:
-#	sudo chown root:root gtksuwrap
-#	sudo chmod ug+s gtksuwrap
 
 install-exec-hook:
 	sudo chown root:root $(DESTDIR)${prefix}/bin/gtksuwrap
