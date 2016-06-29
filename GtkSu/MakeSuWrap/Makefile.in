@@ -589,8 +589,8 @@ uninstall-am: uninstall-binPROGRAMS
 
 
 install-exec-hook:
-	sudo chown root:root $(DESTDIR)${prefix}/bin/gtksuwrap
-	sudo chmod ug+s $(DESTDIR)${prefix}/bin/gtksuwrap
+	chown root:root $(DESTDIR)${prefix}/bin/gtksuwrap||true
+	chmod ug+s $(DESTDIR)${prefix}/bin/gtksuwrap||true
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -31,8 +31,8 @@
 #include <getopt.h>
 
 #include "config.h"
+#include "internet.h"
 
-#define		MYEMAIL "kdhedger68713@gmail.com"
 #define		NOSHADOWUSER -1
 #define		GTKPADDING 4
 char*		user;
@@ -238,7 +238,7 @@ int main(int argc,char **argv)
 						break;
 
 					case 'v':
-						printf("GtkSu Version %s \nCopyright K.D.Hedger 2013-2014, %s\n",VERSION,MYEMAIL);
+						printf("GtkSu Version %s \n%s, %s\n",VERSION,COPYRITE,MYEMAIL);
 						return 0;
 						break;
 
