@@ -1,1 +1,1 @@
-COMMONSRC = ../src/main.cpp
+COMMONSRC = ../src/internet.cpp ../src/main.cpp

@@ -100,7 +100,7 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__dirstamp = $(am__leading_dot)dirstamp
-am__objects_1 = ../src/main.$(OBJEXT)
+am__objects_1 = ../src/internet.$(OBJEXT) ../src/main.$(OBJEXT)
 am_gtksu_OBJECTS = $(am__objects_1)
 gtksu_OBJECTS = $(am_gtksu_OBJECTS)
 gtksu_LDADD = $(LDADD)
@@ -309,7 +309,7 @@ AM_CPPFLAGS = -I$(top_srcdir) \
 			-DLIBDIR=\""${libdir}/${PACKAGE}"\" \
 			-fPIC
 
-COMMONSRC = ../src/main.cpp
+COMMONSRC = ../src/internet.cpp ../src/main.cpp
 gtksu_SOURCES = $(COMMONSRC)
 man1_MANS = ../resources/man/gtksu.1.gz
 @KTSUSSLINK_TRUE@ktsuss = "makelink"
@@ -395,6 +395,8 @@ clean-binPROGRAMS:
 ../src/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) ../src/$(DEPDIR)
 	@: > ../src/$(DEPDIR)/$(am__dirstamp)
+../src/internet.$(OBJEXT): ../src/$(am__dirstamp) \
+	../src/$(DEPDIR)/$(am__dirstamp)
 ../src/main.$(OBJEXT): ../src/$(am__dirstamp) \
 	../src/$(DEPDIR)/$(am__dirstamp)
 
@@ -409,6 +411,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/internet.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@../src/$(DEPDIR)/main.Po@am__quote@
 
 .cpp.o:
