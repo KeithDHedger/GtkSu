@@ -30,7 +30,7 @@
 #define KKEDITPAGE "http://kkedit.freeddns.org"
 #define KKTERMINALPAGE "http://khapplications.freeddns.org/pages/kkterminal/kkterminal.html"
 
-#define COPYRITE "Copyright \xc2\xa9 2013-2016 K.D.Hedger"
+#define COPYRITE "Copyright \xc2\xa9 2013-2019 K.D.Hedger"
 
 #ifndef _USEQT5_
 extern const char	*moreapps[];

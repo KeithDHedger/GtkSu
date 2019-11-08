@@ -1,4 +1,5 @@
 0.1.6
+New email address.
 Removed redundant scripts folder.
 Updated manpage.
 Removed forced CFLAGS and CXXFLAGS.

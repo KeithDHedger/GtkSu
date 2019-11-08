@@ -127,7 +127,7 @@ void doErrorMessage(const char* message,const char* data,const char* secondmessa
 
 void printHelp(void)
 {
-	printf("GtkSu Version %s \nCopyright K.D.Hedger 2013, %s\n",VERSION,MYEMAIL);
+	printf("GtkSu Version %s \nCopyright K.D.Hedger 2013-2019, %s\n",VERSION,MYEMAIL);
 	printf("Usage: gtksu [OPTION] [--] <command>\n");
 	printf("Run a command as another user\n");
 	printf("-u, --user USER			Runs the command as the given user\n");
