@@ -10,7 +10,7 @@ Although there are other programs of theis type most if not all rely on polkit o
 Also it seems that whenever polkit ( which is a nightmare! ) is updated these programs break, so this is the result there are few dependencies a reasonable recent gtk and glib and thats it.<br>
 <br>
 Gtk Version<br>
-![Gtk Version](screenshots/gtksu.png?raw=true "Gtk Version")<br><br>
+![Gtk Version](screenshots/gtksu.png?raw=true "Gtk Version")<br>
 Qt5 Version<br>
 ![Qt5 Version](screenshots/qtgtksu.png?raw=true "Qt5 Version")<br>
 <br>
