@@ -1,70 +1,69 @@
-****************************************************
-*                                                  *
-*    GtkSu ©K.D.Hedger 2013-2019                   *
-*                                                  *
-*    keithdhedger@gmail.com                        *
-*                                                  *
-*                                                  *
-****************************************************
-
-
-Gtksu - what is it?
-
-Simple its a simple replacemnet for gksu/ktsuss etc that alows you to run a program with diferrent priviliges ( root etc ).
-
-Although there are other programs of theis type most if not all rely on polkit or have a large number of dependencies, apps like ktsuss which this app was inspired by ( avaiable here:http://ktsuss.googlecode.com/files/ktsuss-2.tar.gz ), some like ktsuss seem to have been abandoned ( last commit was 2011 ).
-
-Also it seems that whenever polkit ( which is a nightmare! ) is updated these programs break, so this is the result there are few dependencies a reasonable recent gtk and glib and thats it.
-
-Installation
-
-Just run ./autogen.sh or ./configure from this folder then make and sudo make install.
-To install to ( say ) /usr instead of the default /usr/local, add --prefix=/usr, --enable-ktsuss-link will as it says link ktsuss to gtksu so that some programs that hard code the files think that ktsuss is being used ( spacefm ).
-
-You can also choose to build a QT5 version by adding --enable-qt5 to the configure command, the default is to build a gtk GUI.
-To install Qt5 go to here:
-http://qt-project.org/downloads
-
-Download the required file and then do this:
-http://qt-project.org/wiki/Install_Qt_5_on_Ubuntu
-
-If you have installed in /opt/... which is the default for the installer to compile with the --enable-qt5 flag add this line:
-/opt/Qt5.2.1/5.2.1/gcc_64/lib
-to /etc/ld.so.conf
-and do this:
-PKG_CONFIG_PATH=/opt/Qt5.2.1/5.2.1/gcc_64/lib/pkgconfig ./configure --prefix=/usr --enable-ktsuss-link --enable-qt5
-
-If you have installed Qt5 elsewhere just adjust the /etc/ld.so.conf and PKG_CONFIG_PATH to suit.
-
-If your distro disables the root account ( I'm looking at you Ubuntu! ) you may have to set a root password like so:
-Open a Terminal and type:
-sudo su
-passwd
-
-Enter a new password for root twice you may also have to run these two commands whilst logged in as root:
-
-pwconv
-grpconv
-
-Finally logout
-exit
-
-You can now type roots password in to the GtkSu gui and run commands as root.
-
-Usage:
-
-gtksu [OPTION] [--] <command>
-Run a command as another user
--u, --user USER			Runs the command as the given user
--m, --message MESG		Change default message in ktsuss window
-
-Simple usage:
-gtksu terminal.
-
-If you need to add options use -- like so:
-gtksu -u root -- terminal --hold -x ls -AF /
-
-This programme has the potential to hose your system if used unwisely, BE WARNED!
-May present a security risk so use at your own risk.
-
-Bugs etc to the above email address.
+GtkSu (c)K.D.Hedger 2013-2019<br>
+keithdhedger@gmail.com<br>
+<br>
+Gtksu - what is it?<br>
+<br>
+Simple its a simple replacemnet for gksu/ktsuss etc that alows you to run a program with diferrent priviliges ( root etc ).<br>
+<br>
+Although there are other programs of theis type most if not all rely on polkit or have a large number of dependencies, apps like ktsuss which this app was inspired by ( avaiable here:http://ktsuss.googlecode.com/files/ktsuss-2.tar.gz ), some like ktsuss seem to have been abandoned ( last commit was 2011 ).<br>
+<br>
+Also it seems that whenever polkit ( which is a nightmare! ) is updated these programs break, so this is the result there are few dependencies a reasonable recent gtk and glib and thats it.<br>
+<br>
+Gtk Version<br>
+![Gtk Version](screenshots/gtksu.png?raw=true "Gtk Version")<br><br>
+Qt5 Version<br>
+![Qt5 Version](screenshots/qtgtksu.png?raw=true "Qt5 Version")<br>
+<br>
+Installation<br>
+<br>
+Just run ./autogen.sh or ./configure from this folder then make and sudo make install.<br>
+To install to ( say ) /usr instead of the default /usr/local, add --prefix=/usr, --enable-ktsuss-link will as it says link ktsuss to gtksu so that some programs that hard code the files think that ktsuss is being used ( spacefm ).<br>
+<br>
+You can also choose to build a QT5 version by adding --enable-qt5 to the configure command, the default is to build a gtk GUI.<br>
+To install Qt5 go to here:<br>
+http://qt-project.org/downloads<br>
+<br>
+Download the required file and then do this:<br>
+http://qt-project.org/wiki/Install_Qt_5_on_Ubuntu<br>
+<br>
+If you have installed in /opt/... which is the default for the installer to compile with the --enable-qt5 flag add this line:<br>
+/opt/Qt5.2.1/5.2.1/gcc_64/lib<br>
+to /etc/ld.so.conf<br>
+and do this:<br>
+PKG_CONFIG_PATH=/opt/Qt5.2.1/5.2.1/gcc_64/lib/pkgconfig ./configure --prefix=/usr --enable-ktsuss-link --enable-qt5<br>
+<br>
+If you have installed Qt5 elsewhere just adjust the /etc/ld.so.conf and PKG_CONFIG_PATH to suit.<br>
+<br>
+If your distro disables the root account ( I'm looking at you Ubuntu! ) you may have to set a root password like so:<br>
+Open a Terminal and type:<br>
+sudo su<br>
+passwd<br>
+<br>
+Enter a new password for root twice you may also have to run these two commands whilst logged in as root:<br>
+<br>
+pwconv<br>
+grpconv<br>
+<br>
+Finally logout<br>
+exit<br>
+<br>
+You can now type roots password in to the GtkSu gui and run commands as root.<br>
+<br>
+Usage:<br>
+<br>
+gtksu [OPTION] [--] <command><br>
+Run a command as another user<br>
+-u, --user USER			Runs the command as the given user<br>
+-m, --message MESG		Change default message in ktsuss window<br>
+<br>
+Simple usage:<br>
+gtksu terminal.<br>
+<br>
+If you need to add options use -- like so:<br>
+gtksu -u root -- terminal --hold -x ls -AF /<br>
+<br>
+This programme has the potential to hose your system if used unwisely, BE WARNED!<br>
+May present a security risk so use at your own risk.<br>
+<br>
+Bugs etc to the above email address.<br>
+<br>
