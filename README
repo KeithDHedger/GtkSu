@@ -60,7 +60,7 @@ Simple usage:<br>
 gtksu terminal.<br>
 <br>
 If you need to add options use -- like so:<br>
-gtksu -u root -- terminal --hold -x ls -AF /<br>
+gtksu -u root -- kkterminal --hold -e ls -AF /<br>
 <br>
 This programme has the potential to hose your system if used unwisely, BE WARNED!<br>
 May present a security risk so use at your own risk.<br>
