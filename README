@@ -16,7 +16,7 @@ Qt5 Version<br>
 <br>
 Installation<br>
 <br>
-Just run ./autogen.sh or ./configure from this folder then make and sudo make install.<br>
+Just run ./autogen.sh from this folder then make and sudo make install.<br>
 To install to ( say ) /usr instead of the default /usr/local, add --prefix=/usr, --enable-ktsuss-link will as it says link ktsuss to gtksu so that some programs that hard code the files think that ktsuss is being used ( spacefm ).<br>
 <br>
 You can also choose to build a QT5 version by adding --enable-qt5 to the configure command, the default is to build a gtk GUI.<br>

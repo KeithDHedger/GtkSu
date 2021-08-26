@@ -1,2 +1,20 @@
 .svn
 makepkg
+autom4te.cache
+aclocal.m4
+AUTHORS
+compile
+config.*
+configure
+COPYING
+depcomp
+install-sh
+Makefile*
+missing
+NEWS GtkSu/app/Makefile*
+GtkSu/MakeSuWrap/Makefile*
+*.o
+.deps
+*stamp*
+gtksuwrap
+gtksu
