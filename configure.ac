@@ -2,25 +2,33 @@
 #
 AC_INIT([GtkSu],[0.1.6],[PROJ],[GtkSu])
 
-AC_CONFIG_HEADER([config.h])
+#AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
 AC_PROG_CXX
 
 AM_INIT_AUTOMAKE
 
 AC_PROG_CC
-AC_HEADER_STDC
+#AC_HEADER_STDC
 
 PKG_PROG_PKG_CONFIG
 
-AC_ARG_ENABLE(qt5,[  --enable-qt5		Enable QT5.],[enable_qt5=$enableval],[enable_qt5="no"])
-if test $enable_qt5 = "yes" ;then
+AC_ARG_ENABLE(qt6,[  --enable-gtk		Enable GTK.],[enable_gtk=$enableval],[enable_gtk="no"])
+if test $enable_gtk = "no" ;then
+	QTWIDGETS_MODULES="Qt6Widgets >= 6.6.0"
+	PKG_CHECK_MODULES(QTWIDGETS, $QTWIDGETS_MODULES, [got6=yes], [:])
+	if test "$got6" = "yes"; then
+		AC_MSG_NOTICE([Using Qt6])
+		AC_DEFINE([_USEQT_], [], [Build Qt])
+	else
+		QTWIDGETS_MODULES="Qt5Widgets >= 5.15.0"
+		PKG_CHECK_MODULES(QTWIDGETS, $QTWIDGETS_MODULES)
+		AC_MSG_NOTICE([Using Qt5])
+	fi
 
-	QTWIDGETS_MODULES="Qt5Widgets >= 5.2.1"
-	PKG_CHECK_MODULES(QTWIDGETS, $QTWIDGETS_MODULES)
+	AC_DEFINE([_USEQT_], [], [Build Qt])
 	AC_SUBST(QTWIDGETS_CFLAGS)
 	AC_SUBST(QTWIDGETS_LIBS)
-
-	AC_DEFINE([_USEQT5_], [], [Build Qt5])
 else
 	GTK_MODULES="gtk+-2.0 >= 2.24.0"
 	PKG_CHECK_MODULES(GTK, $GTK_MODULES)
@@ -47,5 +55,7 @@ AC_MSG_RESULT($ktsuss)
 
 AC_CHECK_FUNC(clearenv,AC_DEFINE([_GOTCLEARENV_], [],["Clear environment"]))
 
-AC_OUTPUT(Makefile GtkSu/app/Makefile GtkSu/MakeSuWrap/Makefile)
+#AC_OUTPUT(Makefile GtkSu/app/Makefile GtkSu/MakeSuWrap/Makefile)
 
+AC_CONFIG_FILES(Makefile GtkSu/app/Makefile GtkSu/MakeSuWrap/Makefile)
+AC_OUTPUT

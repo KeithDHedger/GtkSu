@@ -21,7 +21,7 @@
 #include "config.h"
 #include "internet.h"
 
-#ifndef _USEQT5_
+#ifndef _USEQT_
 const char	*moreapps[]={
 								"\nMore by the same author\n",
 								"KKEditQT\nhttps://keithdhedger.github.io/KKEditQT/\n",

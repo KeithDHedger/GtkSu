@@ -38,7 +38,7 @@
 char*		user;
 char*		passwd;
 
-#ifndef _USEQT5_
+#ifndef _USEQT_
 #include <gtk/gtk.h>
 GtkWidget*	window=NULL;
 GtkWidget*	nameEntry=NULL;
@@ -68,7 +68,7 @@ int			returnValFromApp=-1;
 
 void shutItDown(gpointer x,gpointer y)
 {
-#ifdef _USEQT5_
+#ifdef _USEQT_
 	return(holdapp->exit(WEXITSTATUS(returnValFromApp)));
 #else
 	gtk_main_quit();
@@ -89,7 +89,7 @@ int runAsUser(int theuid,char*user,char* hashedpass)
 	GString*	str=g_string_new(NULL);
 
 	g_string_append_printf(str,"%s/gtksuwrap %i '%s' '%s' %s",whereFrom,theuid,user,hashedpass,commandStr->str);
-#ifndef _USEQT5_
+#ifndef _USEQT_
 	gtk_widget_hide(window);
 	while(gtk_events_pending())
 		gtk_main_iteration_do(false);
@@ -108,7 +108,7 @@ void doErrorMessage(const char* message,const char* data,const char* secondmessa
 	char*	vmessage;
 
 	asprintf(&vmessage,"%s %s\n%s",message,data,secondmessage);
-#ifndef _USEQT5_
+#ifndef _USEQT_
 	GtkWidget*	dialog;
 	dialog=gtk_message_dialog_new((GtkWindow*)window,GTK_DIALOG_MODAL,GTK_MESSAGE_ERROR,GTK_BUTTONS_CLOSE,"%s %s\n",message,data);
 	gtk_message_dialog_format_secondary_text((GtkMessageDialog*)dialog,"%s\n",secondmessage);
@@ -145,7 +145,7 @@ void getPath(void)
 	whereFrom=g_path_get_dirname(exepath);
 }
 
-#ifdef _USEQT5_
+#ifdef _USEQT_
 QLineEdit*		nameBox;
 QLineEdit*		passBox;
 
@@ -202,7 +202,7 @@ void doGoForIt(void)
 
 void doApply(void)
 {
-#ifdef _USEQT5_
+#ifdef _USEQT_
 	user=strdup(nameBox->text().toUtf8().constData());
 	passwd=strdup(passBox->text().toUtf8().constData());
 #else
@@ -258,7 +258,7 @@ int main(int argc,char **argv)
 	for(int j=optind;j<argc;j++)
 		g_string_append_printf(commandStr," \"%s\"",argv[j]);
 
-#ifdef _USEQT5_
+#ifdef _USEQT_
 	QApplication	app(argc, argv);
 
 	QVBoxLayout*	vlayout=new QVBoxLayout;

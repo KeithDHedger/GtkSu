@@ -37,7 +37,7 @@
 
 #define COPYRITE "Copyright © 2013-2023 K.D.Hedger"
 
-#ifndef _USEQT5_
+#ifndef _USEQT_
 extern const char	*moreapps[];
 extern const char	*authors[];
 #else

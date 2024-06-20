@@ -1,6 +1,10 @@
 GtkSu (c)K.D.Hedger 2013-2019<br>
 kdhedger68713@gmail.com<br>
 <br>
+THIS PROJECT IS NOW DEPRECATED IN FAVOUR OF THE QT5/6 VERSION HERE:<br>
+https://github.com/KeithDHedger/QtSu<br>
+PLEASE USE THE NEW VERSION.<br>
+<br>
 Gtksu - what is it?<br>
 <br>
 Simple its a simple replacemnet for gksu/ktsuss etc that alows you to run a program with diferrent priviliges ( root etc ).<br>
